@@ -8,12 +8,13 @@ Player = {
 
 function Player:update(dt)
     self.active:update(dt)
-    self.co_active.end_rads = self.active.end_rads
+    -- Easier to make a new arc on direction switch than the snapshotting?
+    self.co_active.arc.end_rads = self.active.end_rads
 end
 
 function Player:detectCollision(collider)
     for shape, delta in pairs(collider:collisions(self.co_active)) do
-        print(shape)
+        self.active:intersectsArc(shape.arc)
     end
 end
 

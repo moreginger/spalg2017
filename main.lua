@@ -8,7 +8,7 @@ function love.load()
 
     collider = HC.new(100)
 
-    top = collider:rectangle(-radius * 3, 200, width + radius * 3, 300)
+    -- top = collider:rectangle(-radius * 3, 200, width + radius * 3, 300)
 
     players = {}
     players[1] = Player:new(
@@ -25,20 +25,20 @@ function love.load()
             )
         }
     )
-    players[2] = Player:new(
-        {
-            active = Arc:new(
-                {
-                    x = 600,
-                    y = 200,
-                    radius = radius,
-                    start_rads = 0,
-                    end_rads = 0,
-                    contacts = {}
-                }
-            )
-        }
-    )
+    -- players[2] = Player:new(
+    --     {
+    --         active = Arc:new(
+    --             {
+    --                 x = 600,
+    --                 y = 200,
+    --                 radius = radius,
+    --                 start_rads = 0,
+    --                 end_rads = 0,
+    --                 contacts = {}
+    --             }
+    --         )
+    --     }
+    -- )
     for i = 1, #players do
         players[i]:addToCollider(collider)
     end
@@ -52,7 +52,12 @@ function love.keypressed(key, scan_code, is_repeat)
    end
 end
 
+function love.focus(f)
+    gameIsPaused = not f
+end
+
 function love.update(dt)
+    if gameIsPaused then return end
     for i = 1, #players do
        players[i]:update(dt, collider)
        players[i]:detectCollision(collider)
