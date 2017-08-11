@@ -15,8 +15,17 @@ function Player:changeDirection()
     self.active:changeDirection()
 end
 
+function Player:draw()
+    arc = self.active
+    love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
+    for i = 1, #self.trail do
+        arc = self.trail[i]
+        love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
+    end
+end
+
 function Player:new (o)
-    o = o or { active = Arc:new({ x = 200, y = 200, radius = 32, start_rads = 0, end_rads = 0 }) }
+    o = o or {}
     setmetatable(o, self)
     self.__index = self
     return o

@@ -10,27 +10,29 @@ function love.load()
     Body = love.physics.newBody(World, 0, 0, "static")
     love.physics.newFixture(Body, E)
 
-    Players = {}
-    Players[1] = Player:new()
+    players = {}
+    players[1] = Player:new({ active = Arc:new({ x = 200, y = 200, radius = 32, start_rads = 0, end_rads = 0 }) })
+    players[2] = Player:new({active = Arc:new({ x = 600, y = 200, radius = 32, start_rads = 0, end_rads = 0, direction = 'right' }) })
 end
 
 function love.update(dt)
-    Players[1]:update(dt)
+    for i = 1, #players do
+       players[i]:update(dt)
+    end
 end
 
 function love.keypressed(key, scan_code, is_repeat)
-   Players[1]:changeDirection()
+   if key == 'a' then
+       players[1]:changeDirection()
+   elseif key == 'l' then
+       players[2]:changeDirection()
+   end
 end
 
 function love.draw()
-    arc = Players[1].active
-    love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
-    trail = Players[1].trail
-    for i = 1, #trail do
-        arc = trail[i]
-        love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
+    for i = 1, #players do
+       players[i]:draw()
     end
-    
     -- love.graphics.line(Body:getWorldPoints(E:getPoints()))
     -- World:rayCast(0, 100, 100, 0, worldRayCastCallback)
 end
