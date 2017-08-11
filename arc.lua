@@ -18,7 +18,22 @@ function Arc:changeDirection()
     self.y = self.y + dy
     self.start_rads = self.end_rads + math.pi
     self.end_rads = self.start_rads
+    self.contacts = {}
     self.direction = self.direction == 'left' and 'right' or 'left'
+end
+
+function Arc:addToCollider(collider)
+    co_arc = collider:circle(self.x, self.y, self.radius)
+    co_arc.start_rads = self.start_rads
+    co_arc.end_rads = self.end_rads
+    return co_arc
+end
+
+function Arc:addContactLine(intersections)
+    -- convert intersections to radians on arc
+    -- define good/bad range
+    self.contacts[#self.contacts+1] = {
+    }
 end
 
 function Arc:new(o)
