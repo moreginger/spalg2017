@@ -91,6 +91,7 @@ function Arc:intersectsArc(other)
 end
 
 function isBetween(start_rads, end_rads, query_rads)
+    start_rads, end_rads = math.min(start_rads, end_rads), math.max(start_rads, end_rads)
     if debug then
         print('start end query')
         print(start_rads, end_rads, query_rads)
