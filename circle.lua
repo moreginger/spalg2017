@@ -1,25 +1,13 @@
 
+-- Return intersect angles in radians where 0 = right, pi/2 = down etc.
 function intersectAngles(c1, c2)
 
-    r1  = c1.radius
+    r1 = c1.radius
     r2 = c2.radius
-    cx = c1.x
-    cy = c1.y
-    Cx = c2.x
-    Cy = c2.y
-    -- if c1.radius < c2.radius then
-    -- else
-    --     r  = c2.radius
-    --     R  = c1.radius
-    --     Cx = c1.x
-    --     Cy = c1.y
-    --     cx = c2.x
-    --     cy = c2.y
-    -- end
 
     --  Compute the vector
-    dx = cx - Cx
-    dy = cy - Cy
+    dx = c1.x - c2.x
+    dy = c1.y - c2.y
 
     d = math.sqrt(dx * dx + dy * dy)
 
@@ -41,15 +29,26 @@ function intersectAngles(c1, c2)
         return {}
     end
 
-    angle = math.atan(dy / dx)
+    angle = math.abs(dx) > 0 and math.atan(math.abs(dy) / math.abs(dx)) or math.pi / 2
+    angle = dx >= 0 and angle or math.pi - angle
+    angle = dy < 0 and angle or math.pi * 2 - angle
+    print('base angle', angle, dy)
 
     --   // Single intersection (kissing circles)
     if math.abs(gap) < eps or math.abs(nested_gap) < eps then
-        return { { angle, angle } }
+        return { { _normalizeAngle(angle), _normalizeAngle(angle + math.pi) } }
     end
 
     delta1 = math.acos((r1*r1-d*d-r2*r2)/(-2.0*d*r2))
     delta2 = math.acos((r2*r2-d*d-r1*r1)/(-2.0*d*r1))
-    return { { angle + delta1, angle + math.pi - delta2 }, { angle - delta1, angle + math.pi + delta2 } }
+    return {
+        { _normalizeAngle(angle + delta1), _normalizeAngle(angle + math.pi - delta2) },
+        { _normalizeAngle(angle - delta1), _normalizeAngle(angle + math.pi + delta2) }
+    }
 
 end
+
+function _normalizeAngle(angle)
+    return angle < 0 and angle + math.pi * 2 or angle >= math.pi * 2 and angle - math.pi * 2 or angle
+end
+

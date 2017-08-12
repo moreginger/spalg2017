@@ -1,5 +1,7 @@
 require 'circle'
 
+debug = false
+
 Arc = {
     x = 0,
     y = 0,
@@ -60,22 +62,22 @@ end
 test = 0
 
 function Arc:intersectsArc(other)
-    -- print('current angles')
-    -- print(self.start_rads)
-    -- print(self.end_rads)
     intersect_angles = intersectAngles(self, other)
     if intersect_angles == nil then
-        -- overlapping (probably hit self)
+        -- overlapping (probably self)
         if isBetween(other.start_rads, other.end_rads, self.end_rads) then
-            print('is intersect')
+            if debug then print('overlap') end
             gameIsPaused = true
             return true
         end
     else
-        for i, angles in pairs(intersectAngles(self, other)) do
-            print('testing angle set')
+        for i, angles in pairs(intersect_angles) do
             if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
-                print('is intersect')
+                if debug then
+                    print('intersect')
+                    print(self.start_rads, self.end_rads, angles[1])
+                    print(other.start_rads, other.end_rads, angles[2])
+                end
                 gameIsPaused = true
                 return true
             end
@@ -85,13 +87,15 @@ function Arc:intersectsArc(other)
 end
 
 function isBetween(start_rads, end_rads, query_rads)
-    print('query angle')
-    print(start_rads, end_rads, query_rads)
+    if debug then
+        print('start end query')
+        print(start_rads, end_rads, query_rads)
+    end
     end_rads = end_rads - start_rads
     end_rads = end_rads >= 0 and end_rads or end_rads + 2 * math.pi
     query_rads = query_rads - start_rads
     query_rads = query_rads >= 0 and query_rads or query_rads + 2 * math.pi
-    print(end_rads, query_rads)
+    if debug then print(end_rads, query_rads) end
     return query_rads <= end_rads
 end
 
