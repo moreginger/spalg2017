@@ -8,29 +8,24 @@ Player = {
 
 function Player:update(dt)
     self.active:update(dt)
-    -- Easier to make a new arc on direction switch than the snapshotting?
-    self.co_active.arc.end_rads = self.active.end_rads
 end
 
 function Player:detectCollision(collider)
-    for shape, delta in pairs(collider:collisions(self.co_active)) do
+    for shape, delta in pairs(collider:collisions(self.active.co)) do
         self.active:intersectsArc(shape.arc)
     end
 end
 
 function Player:changeDirection(collider)
-    snapshot = self.active:snapshot()
-    -- nope
-    snapshot.co = self.co_active
-    self.trail[#self.trail+1] = snapshot
-    self.active:changeDirection()
+    self.trail[#self.trail+1] = self.active
+    self.active = self.active:changeDirection()
     self:addToCollider(collider)
 end
 
 function Player:addToCollider(collider)
     print('added')
     self.co_active = self.active:addToCollider(collider)
-    -- todo hard refs to objects!!!
+    print(self.active.start_rads)
 end
 
 function Player:draw()
