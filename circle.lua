@@ -45,10 +45,11 @@ function intersectAngles(c1, c2)
 
     --   // Single intersection (kissing circles)
     if math.abs(gap) < eps or math.abs(nested_gap) < eps then
-        return { angle }
+        return { { angle, angle } }
     end
 
-    delta = math.acos((r1*r1-d*d-r2*r2)/(-2.0*d*r2))
-    return { angle + delta, angle - delta }
+    delta1 = math.acos((r1*r1-d*d-r2*r2)/(-2.0*d*r2))
+    delta2 = math.acos((r2*r2-d*d-r1*r1)/(-2.0*d*r1))
+    return { { angle + delta1, angle + math.pi - delta2 }, { angle - delta1, angle + math.pi + delta2 } }
 
 end
