@@ -8,11 +8,15 @@ Arc = {
     radius = 0,
     start_rads = 0,
     end_rads = 0,
-    direction = 'left'
+    direction = 'acw'
 }
 
 function Arc:update(dt)
-    self.end_rads = self.end_rads + (self.direction == 'left' and -dt or dt) * 1
+    if self.direction == 'acw' then
+       self.end_rads = self.end_rads + dt
+    else
+       self.end_rads = self.end_rads - dt
+    end
 end
 
 function Arc:normalize()
@@ -39,7 +43,7 @@ function Arc:changeDirection()
         y = self.y + dy,
         start_rads = start_rads,
         end_rads = start_rads,
-        direction = self.direction == 'left' and 'right' or 'left'
+        direction = self.direction == 'acw' and 'cw' or 'acw'
     })
     new_arc:normalize()
     return new_arc
