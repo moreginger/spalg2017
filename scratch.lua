@@ -30,25 +30,19 @@ function scratch()
     upper_left_acw = base:new({ start_rads = math.pi, end_rads = math.pi * 3 / 2 })
 
     testIntersectsArc('concentric arcs 1', half_lower_acw, half_left_acw, true)
-    testIntersectsArc('concentric arcs 2', half_left_acw, half_lower_acw, false)
-    testIntersectsArc('concentric arcs 3', lower_right_acw, upper_left_acw, false)
+    testIntersectsArc('concentric arcs 2', half_left_acw, half_lower_acw, false) -- concentric arcs are special. One arc "ahead" of other
+    testIntersectsArc('concentric arcs disjoint', lower_right_acw, upper_left_acw, false)
 
     testIntersectsArc('touching arcs 1', half_lower_acw, half_upper_acw:new({y = 200}), true)
     testIntersectsArc('touching arcs 2', half_upper_acw:new({y = 200}), half_lower_acw, true)
 
-    -- print('testing touching arcs...')
-    -- if not lower_half:new({x = 0}):intersectsArc(lower_half) then fail() end
+    testIntersectsArc('intersecting arcs 1', half_lower_acw, half_upper_acw:new({y = 100}), true)
+    testIntersectsArc('intersecting arcs 2', half_upper_acw:new({y = 100}), half_lower_acw, true)
+    testIntersectsArc('intersecting arcs 3', half_lower_acw, half_upper_acw:new({x = 10, y = 100}), true)
+    testIntersectsArc('intersecting arcs 4', half_upper_acw:new({x = 10, y = 100}), half_lower_acw, true)
 
-    -- print('testing intersecting arcs...')
-    -- if not lower_half:new({x = 100}):intersectsArc(lower_half) then fail() end
-
-    -- print('testing disjoint arcs...')
-    -- if lower_half:new({x = 1000}):intersectsArc(lower_half) then fail() end
-
-    -- print('testing disjoint arcs on same circle...')
-    -- if lower_right:intersectsArc(upper_left) then fail() end
-    -- print('flipped...')
-    -- if upper_left:intersectsArc(lower_right) then fail() end
+    testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
+    testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, false)
 
     print('finished testing')
     print('')

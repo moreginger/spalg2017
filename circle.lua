@@ -32,7 +32,7 @@ function intersectAngles(c1, c2)
     angle = math.abs(dx) > 0 and math.atan(math.abs(dy) / math.abs(dx)) or math.pi / 2
     angle = dx >= 0 and angle or math.pi - angle
     angle = dy < 0 and angle or math.pi * 2 - angle
-    print('base angle', angle, dy)
+    -- print('base angle', angle, dy)
 
     --   // Single intersection (kissing circles)
     if math.abs(gap) < eps or math.abs(nested_gap) < eps then
