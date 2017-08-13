@@ -70,7 +70,11 @@ function Arc:intersectsArc(other)
     if intersect_angles == nil then
         -- overlapping (probably self)
         if isBetween(other.start_rads, other.end_rads, self.end_rads) then
-            if debug then print('overlap') end
+            if debug then
+                print('overlap')
+                print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads)
+                print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads)
+            end
             gameIsPaused = true
             return true
         end
@@ -79,8 +83,9 @@ function Arc:intersectsArc(other)
             if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
                 if debug then
                     print('intersect')
-                    print(self.start_rads, self.end_rads, angles[1])
-                    print(other.start_rads, other.end_rads, angles[2])
+                    print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads)
+                    print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads)
+                    print(angles[1] .. ', ' .. angles[2])
                 end
                 gameIsPaused = true
                 return true
