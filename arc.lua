@@ -1,6 +1,6 @@
 require 'circle'
 
-debug = false
+debug = true
 
 Arc = {
     x = 0,
@@ -20,6 +20,7 @@ function Arc:update(dt)
 end
 
 function Arc:normalize()
+    -- overkill because we can't use this during update
     while self.start_rads < 0 do
         self.start_rads = self.start_rads + 2 * math.pi
     end
@@ -101,12 +102,15 @@ function isBetween(start_rads, end_rads, query_rads)
         print('start end query')
         print(start_rads, end_rads, query_rads)
     end
-    end_rads = end_rads - start_rads
-    end_rads = end_rads >= 0 and end_rads or end_rads + 2 * math.pi
-    query_rads = query_rads - start_rads
-    query_rads = query_rads >= 0 and query_rads or query_rads + 2 * math.pi
+    if end_rads - start_rads >= math.pi * 2 then return true end
+    end_rads = normalizeAngle(end_rads - start_rads)
+    query_rads = normalizeAngle(query_rads - start_rads)
     if debug then print(end_rads, query_rads) end
     return query_rads <= end_rads
+end
+
+function Arc:draw()
+    love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
 function Arc:new(o)
