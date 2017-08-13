@@ -42,7 +42,10 @@ function scratch()
     testIntersectsArc('intersecting arcs 4', half_upper_acw:new({x = 10, y = 100}), half_lower_acw, true)
 
     testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
-    testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, false)
+    testIntersectsArc('disjoint arcs 2', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, false)
+
+    testIntersectsArc('real intersect 1', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.0, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true)
+    testIntersectsArc('real intersect 2', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.2, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true) -- should hit
 
     print('finished testing')
     print('')
