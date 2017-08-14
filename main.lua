@@ -20,7 +20,7 @@ function love.load()
                     x = 200,
                     y = 200,
                     radius = radius,
-                    contacts = {}
+                    player = 1
                 }
             )
         }

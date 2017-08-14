@@ -10,9 +10,18 @@ function Player:update(dt)
     self.active:update(dt)
 end
 
+function exit()
+   love.timer.sleep(600)
+end
+
 function Player:detectCollision(collider)
     for shape, delta in pairs(collider:collisions(self.active.co)) do
-        self.active:intersectsArc(shape.arc)
+        if self.active.player == shape.arc.player and math.abs(self.active:rads() - shape.arc:rads()) <= math.pi then
+            -- Impossible to collide with own line if < half circle direction change
+            -- Needed to stop insta-collisions on direction change
+        elseif self.active:intersectsArc(shape.arc) then
+            exit()
+        end
     end
 end
 

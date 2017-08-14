@@ -8,7 +8,8 @@ Arc = {
     radius = 0,
     start_rads = 0,
     end_rads = 0,
-    direction = 'acw'
+    direction = 'acw',
+    player = 0
 }
 
 function Arc:update(dt)
@@ -22,13 +23,14 @@ end
 function Arc:changeDirection()
     dx = math.cos(self.end_rads) * self.radius * 2
     dy = math.sin(self.end_rads) * self.radius * 2
-    start_rads = self.end_rads + math.pi
+    start_rads = self.end_rads + (self.direction == 'acw' and math.pi or -math.pi)
     new_arc = self:new({
         x = self.x + dx,
         y = self.y + dy,
         start_rads = start_rads,
         end_rads = start_rads,
-        direction = self.direction == 'acw' and 'cw' or 'acw'
+        direction = self.direction == 'acw' and 'cw' or 'acw',
+        player = self.player
     })
     return new_arc
 end
@@ -40,14 +42,9 @@ function Arc:addToCollider(collider)
     self.co = co
 end
 
-function Arc:addContactLine(intersections)
-    -- convert intersections to radians on arc
-    -- define good/bad range
-    self.contacts[#self.contacts+1] = {
-    }
+function Arc:rads()
+    return self.direction == 'acw' and self.end_rads or self.end_rads - math.pi
 end
-
-test = 0
 
 function Arc:intersectsArc(other)
     intersect_angles = intersectAngles(self, other)
