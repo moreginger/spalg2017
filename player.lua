@@ -32,9 +32,7 @@ function Player:changeDirection(collider)
 end
 
 function Player:addToCollider(collider)
-    print('added')
     self.co_active = self.active:addToCollider(collider)
-    print(self.active.start_rads)
 end
 
 function Player:draw()
