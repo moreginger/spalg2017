@@ -19,22 +19,6 @@ function Arc:update(dt)
     end
 end
 
-function Arc:normalize()
-    -- overkill because we can't use this during update
-    while self.start_rads < 0 do
-        self.start_rads = self.start_rads + 2 * math.pi
-    end
-    while self.start_rads >= 2 * math.pi do
-        self.start_rads = self.start_rads - 2 * math.pi
-    end
-    while self.end_rads < 0 do
-        self.end_rads = self.end_rads + 2 * math.pi
-    end
-    while self.end_rads >= 2 * math.pi do
-        self.end_rads = self.end_rads - 2 * math.pi
-    end
-end
-
 function Arc:changeDirection()
     dx = math.cos(self.end_rads) * self.radius * 2
     dy = math.sin(self.end_rads) * self.radius * 2
@@ -46,7 +30,6 @@ function Arc:changeDirection()
         end_rads = start_rads,
         direction = self.direction == 'acw' and 'cw' or 'acw'
     })
-    new_arc:normalize()
     return new_arc
 end
 

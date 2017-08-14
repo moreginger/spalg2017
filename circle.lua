@@ -50,6 +50,5 @@ function intersectAngles(c1, c2)
 end
 
 function normalizeAngle(angle)
-    return angle < 0 and angle + math.pi * 2 or angle >= math.pi * 2 and angle - math.pi * 2 or angle
+    return angle % (math.pi * 2)
 end
-
