@@ -8,6 +8,12 @@ Player = {
 
 function Player:update(dt)
     self.active:update(dt)
+    if math.abs(self.active.start_rads - self.active.end_rads) > math.pi / 2 then
+        -- Split arc to stop self-collisions with previous arc segment, working together with angle restrition in detectCollision.
+        self.trail[#self.trail+1] = self.active
+        self.active = self.active:new({start_rads = self.active.end_rads})
+        self:addToCollider(collider)
+    end
 end
 
 function exit()
@@ -32,7 +38,7 @@ function Player:changeDirection(collider)
 end
 
 function Player:addToCollider(collider)
-    self.co_active = self.active:addToCollider(collider)
+    self.active:addToCollider(collider)
 end
 
 function Player:draw()
