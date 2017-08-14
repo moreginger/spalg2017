@@ -1,10 +1,10 @@
 require 'player'
-require 'scratch'
+require 'test'
 
 HC = require 'hc'
 
 function love.load()
-    scratch()
+    test()
     width, height, flags = love.window.getMode()
 	radius = height / 16
 
@@ -68,6 +68,4 @@ function love.draw()
     for i = 1, #players do
        players[i]:draw()
     end
-    -- love.graphics.print(#players[2].active.contacts)
-    -- top.draw('fill')
 end

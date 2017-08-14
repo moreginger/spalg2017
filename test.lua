@@ -9,7 +9,7 @@ function testIntersectsArc(name, query, static, expect)
     end
 end
 
-function scratch()
+function test()
     base = Arc:new({ x = 0, y = 0, radius = 100, start_rads = 0, end_rads = 2 * math.pi})
 
     testIntersectsArc('coincident circles', base, base, true)
@@ -41,13 +41,14 @@ function scratch()
     testIntersectsArc('intersecting arcs 3', half_lower_acw, half_upper_acw:new({x = 10, y = 100}), true)
     testIntersectsArc('intersecting arcs 4', half_upper_acw:new({x = 10, y = 100}), half_lower_acw, true)
 
-    testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
+    -- testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
     testIntersectsArc('disjoint arcs 2', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, false)
 
     testIntersectsArc('real intersect 1', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.0, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true)
     testIntersectsArc('real intersect 2', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.2, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true) -- should hit
 
-    print('finished testing')
     print('')
-    io.read()
+    print('*** FINISHED TESTING ***')
+    print('')
+    -- io.read()
 end
