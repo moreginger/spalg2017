@@ -1,6 +1,6 @@
 require 'circle'
 
-debug = true
+debug = false
 
 Arc = {
     x = 0,
@@ -14,9 +14,9 @@ Arc = {
 
 function Arc:update(dt)
     if self.direction == 'acw' then
-       self.end_rads = self.end_rads + dt
+       self.end_rads = self.end_rads + dt * 4
     else
-       self.end_rads = self.end_rads - dt
+       self.end_rads = self.end_rads - dt * 4
     end
 end
 
@@ -52,21 +52,21 @@ function Arc:intersectsArc(other)
         -- overlapping (probably self)
         if isBetween(other.start_rads, other.end_rads, self.end_rads) then
             if debug then
-                print('overlap')
-                print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads)
-                print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads)
+                print('overlap found!')
             end
             gameIsPaused = true
             return true
         end
     else
         for i, angles in pairs(intersect_angles) do
+            if debug then
+                print('testing arcs')
+                print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
+                print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
+            end
             if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
                 if debug then
-                    print('intersect')
-                    print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads)
-                    print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads)
-                    print(angles[1] .. ', ' .. angles[2])
+                    print('intersect found!')
                 end
                 gameIsPaused = true
                 return true
@@ -85,7 +85,7 @@ function isBetween(start_rads, end_rads, query_rads)
     if end_rads - start_rads >= math.pi * 2 then return true end
     end_rads = normalizeAngle(end_rads - start_rads)
     query_rads = normalizeAngle(query_rads - start_rads)
-    if debug then print(end_rads, query_rads) end
+    if debug then print('-', end_rads, query_rads) end
     return query_rads <= end_rads
 end
 
