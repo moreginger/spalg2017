@@ -42,11 +42,9 @@ function Player:addToCollider(collider)
 end
 
 function Player:draw()
-    arc = self.active
-    love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
+    self.active:draw()
     for i = 1, #self.trail do
-        arc = self.trail[i]
-        love.graphics.arc('line', 'open', arc.x, arc.y, arc.radius, arc.start_rads, arc.end_rads)
+        self.trail[i]:draw()
     end
 end
 
