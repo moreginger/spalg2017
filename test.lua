@@ -1,11 +1,13 @@
 require 'arc'
 
+failed = 0
+
 function testIntersectsArc(name, query, static, expect)
     print('testing', name, '...')
     if expect ~= query:intersectsArc(static) then
-        print('failed')
+        print('!!!FAILED!!!')
         print('')
-        love.event.quit()
+        failed = failed + 1
     end
 end
 
@@ -50,8 +52,16 @@ function test()
     testIntersectsArc('real intersect 3', Arc:new({x = 217, y = 245, start_rads = 8.4, end_rads = 6.5, radius = 37.5}), Arc:new({x = 251, y = 292, start_rads = 3.8, end_rads = 3.2, radius = 37.5}), true)
     testIntersectsArc('real intersect 4', Arc:new({x = 217, y = 245, start_rads = 8.4, end_rads = 6.6, radius = 37.5}), Arc:new({x = 251, y = 292, start_rads = 3.8, end_rads = 3.2, radius = 37.5}), true)
 
+    testIntersectsArc('different radius 1', base:new({x = 100, radius = 50, start_rads = math.pi / 2, end_rads = math.pi * 3 / 2}), base:new({start_rads = - math.pi / 2, end_rads = math.pi / 2}), true)
+    testIntersectsArc('different radius 2', base:new({x = 60, radius = 50, start_rads = math.pi / 2, end_rads = math.pi * 3 / 2}), base:new({start_rads = - math.pi / 2, end_rads = math.pi / 2}), false)
+    testIntersectsArc('different radius 3', base:new({x = 118, y = 269, radius = 37.5, start_rads = 0.07, end_rads = 0.24}), base:new({x = 400, y = 300, radius = 300, start_rads = 0, end_rads = math.pi * 2}), false)
+
     print('')
     print('*** FINISHED TESTING ***')
     print('')
-    -- io.read()
+
+    if failed > 0 then
+        print('Failed ' .. failed .. ' tests.')
+        io.read()
+    end
 end

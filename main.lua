@@ -1,16 +1,20 @@
-require 'player'
 require 'test'
+
+require 'arc'
+require 'player'
 
 HC = require 'hc'
 
 function love.load()
-    -- test()
+    test()
+
     width, height, flags = love.window.getMode()
 	radius = height / 16
 
     collider = HC.new(100)
-
-    -- top = collider:rectangle(-radius * 3, 200, width + radius * 3, 300)
+    map_radius = math.min(width, height) / 2
+    map = Arc:new({ x = width / 2, y = height / 2, radius = map_radius, end_rads = math.pi * 2, direction = 'acw', player = 0 })
+    map:addToCollider(collider)
 
     players = {}
     players[1] = Player:new(
