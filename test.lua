@@ -44,8 +44,11 @@ function test()
     -- testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
     testIntersectsArc('disjoint arcs 2', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, false)
 
-    testIntersectsArc('real intersect 1', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.0, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true)
-    testIntersectsArc('real intersect 2', base:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.2, radius = 37.5}), base:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true) -- should hit
+    testIntersectsArc('real intersect 1', Arc:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.0, radius = 37.5}), Arc:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true)
+    testIntersectsArc('real intersect 2', Arc:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.2, radius = 37.5}), Arc:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), true) -- should hit
+
+    testIntersectsArc('real intersect 3', Arc:new({x = 217, y = 245, start_rads = 8.4, end_rads = 6.5, radius = 37.5}), Arc:new({x = 251, y = 292, start_rads = 3.8, end_rads = 3.2, radius = 37.5}), true)
+    testIntersectsArc('real intersect 4', Arc:new({x = 217, y = 245, start_rads = 8.4, end_rads = 6.6, radius = 37.5}), Arc:new({x = 251, y = 292, start_rads = 3.8, end_rads = 3.2, radius = 37.5}), true)
 
     print('')
     print('*** FINISHED TESTING ***')
