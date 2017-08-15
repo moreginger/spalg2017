@@ -61,8 +61,8 @@ function Arc:intersectsArc(other)
         for i, angles in pairs(intersect_angles) do
             if debug then
                 print('testing arcs')
-                print('[' .. other.x .. ',' .. other.y .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
-                print('[' .. self.x .. ',' .. self.y .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
+                print('[' .. self.x .. ',' .. self.y .. ',' .. self.radius .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
+                print('[' .. other.x .. ',' .. other.y .. ',' .. other.radius .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
             end
             if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
                 if debug then
