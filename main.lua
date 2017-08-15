@@ -4,7 +4,7 @@ require 'test'
 HC = require 'hc'
 
 function love.load()
-    test()
+    -- test()
     width, height, flags = love.window.getMode()
 	radius = height / 16
 
@@ -25,20 +25,18 @@ function love.load()
             )
         }
     )
-    -- players[2] = Player:new(
-    --     {
-    --         active = Arc:new(
-    --             {
-    --                 x = 600,
-    --                 y = 200,
-    --                 radius = radius,
-    --                 start_rads = 0,
-    --                 end_rads = 0,
-    --                 contacts = {}
-    --             }
-    --         )
-    --     }
-    -- )
+    players[2] = Player:new(
+        {
+            active = Arc:new(
+                {
+                    x = 600,
+                    y = 200,
+                    radius = radius,
+                    player = 2
+                }
+            )
+        }
+    )
     for i = 1, #players do
         players[i]:addToCollider(collider)
     end
