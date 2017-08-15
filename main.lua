@@ -70,4 +70,5 @@ function love.draw()
     for i = 1, #players do
        players[i]:draw()
     end
+    map:draw()
 end
