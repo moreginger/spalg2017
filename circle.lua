@@ -30,10 +30,8 @@ function intersectAngles(c1, c2)
     end
 
     angle = math.abs(dx) > 0 and math.atan(math.abs(dy) / math.abs(dx)) or math.pi / 2
-    print('base angle', angle, dx, dy)
     angle = dx >= 0 and angle or math.pi - angle
     angle = dy >= 0 and angle or math.pi * 2 - angle
-    print('adj angle', angle)
 
     --   // Single intersection (kissing circles)
     if math.abs(gap) < eps or math.abs(nested_gap) < eps then
@@ -43,8 +41,8 @@ function intersectAngles(c1, c2)
     delta1 = math.acos((r1*r1-d*d-r2*r2)/(-2.0*d*r2))
     delta2 = math.acos((r2*r2-d*d-r1*r1)/(-2.0*d*r1))
     return {
-        { normalizeAngle(angle + delta1), normalizeAngle(angle + math.pi + delta2) },
-        { normalizeAngle(angle - delta1), normalizeAngle(angle + math.pi - delta2) }
+        { normalizeAngle(angle + delta1), normalizeAngle(angle + math.pi - delta2) },
+        { normalizeAngle(angle - delta1), normalizeAngle(angle + math.pi + delta2) }
     }
 
 end
