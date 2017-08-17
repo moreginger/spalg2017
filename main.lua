@@ -10,20 +10,27 @@ function love.load()
     test()
 
     screen_x, screen_y, flags = love.window.getMode()
-	radius = math.min(screen_x, screen_y) / 16
+	local radius = math.min(screen_x, screen_y) / 16
 
-    status_font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius)
+    local status_font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius)
     players = {}
-    players[1] = Player:new({ status = Status:new({ display_x = 50, display_y = 50, font = status_font}) })
-    players[2] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = screen_y - 50, font = status_font}) })
+    local arc = Arc:new({radius = radius})
+    players[1] = Player:new({ status = Status:new({ display_x = 50, display_y = 50, font = status_font}), active = arc:new({player = 1}) })
+    players[2] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = 50, font = status_font}), active = arc:new({player = 2}) })
+    players[3] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = screen_y - 50, font = status_font}), active = arc:new({player = 3}) })
+    players[4] = Player:new({ status = Status:new({ display_x = 50, display_y = screen_y - 50, font = status_font}), active = arc:new({player = 4}) })
     _reset()
 end
 
 function love.keypressed(key, scan_code, is_repeat)
-   if key == 'a' then
+   if key == 'q' then
        players[1]:changeDirection(collider)
-   elseif key == 'l' then
+   elseif key == 'p' then
        players[2]:changeDirection(collider)
+    elseif key == '.' then
+       players[3]:changeDirection(collider)
+    elseif key == 'z' then
+       players[4]:changeDirection(collider)
    end
 end
 
@@ -70,8 +77,14 @@ function _reset()
         players[i].alive = true
         players[i].trail = {}
     end
-    players[1].active = Arc:new({ x = map_x + math.cos(math.pi) * map_radius / 2, y = map_y + math.cos(math.pi) * map_radius / 2, radius = radius, start_rads = 0, end_rads = 0, player = 1})
-    players[2].active = Arc:new({ x = map_x + math.cos(0) * map_radius / 2, y = map_y + math.cos(0) * map_radius / 2, radius = radius, start_rads = math.pi, end_rads = math.pi, player = 2})
+
+    local function _resetActive(player, angle)
+        player.active = player.active:new({ x = map_x + math.cos(angle) * map_radius * 3 / 4, y = map_y + math.sin(angle) * map_radius * 3 / 4, start_rads = angle, end_rads = angle, direction = 'acw' })
+    end
+    _resetActive(players[1], math.pi * 5 / 4)
+    _resetActive(players[2], math.pi * 7 / 4)
+    _resetActive(players[3], math.pi * 1 / 4)
+    _resetActive(players[4], math.pi * 3 / 4)
 
     for i = 1, #players do
         players[i]:addToCollider(collider)

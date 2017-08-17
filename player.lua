@@ -42,7 +42,9 @@ function Player:draw()
     -- Active arc
     local active = self.active
     active:draw()
-    active:drawEndDot()
+    if self.alive then
+        active:drawEndDot()
+    end
     -- Trail
     for i = 1, #self.trail do
         self.trail[i]:draw()
