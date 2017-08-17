@@ -2,15 +2,20 @@ require 'test'
 
 require 'arc'
 require 'player'
+require 'status'
 
 HC = require 'hc'
 
 function love.load()
     test()
 
+    screen_x, screen_y, flags = love.window.getMode()
+	radius = math.min(screen_x, screen_y) / 16
+
+    status_font = love.graphics.newFont(radius)
     players = {}
-    players[1] = Player:new()
-    players[2] = Player:new()
+    players[1] = Player:new({ status = Status:new({ display_x = 50, display_y = 50, font = status_font}) })
+    players[2] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = screen_y - 50, font = status_font}) })
     _reset()
 end
 
@@ -54,13 +59,10 @@ function love.draw()
 end
 
 function _reset()
-    width, height, flags = love.window.getMode()
-	radius = height / 16
-
     collider = HC.new(100)
-    map_radius = math.min(width, height) / 2
-    map_x = width / 2
-    map_y = height / 2
+    map_radius = math.min(screen_x, screen_y) / 2
+    map_x = screen_x / 2
+    map_y = screen_y / 2
     map = Arc:new({ x = map_x, y = map_y, radius = map_radius, end_rads = math.pi * 2, direction = 'acw', player = 0 })
     map:addToCollider(collider)
 
@@ -73,6 +75,5 @@ function _reset()
 
     for i = 1, #players do
         players[i]:addToCollider(collider)
-        print('p' .. i .. ':' .. players[i].wins)
     end
 end

@@ -1,11 +1,10 @@
 require 'arc'
 
 Player = {
-    active = Arc:new(),
-    trail = {
-    },
+    active = nil,
+    trail = nil,
     alive = true,
-    wins = 0
+    status = nil
 }
 
 function Player:update(dt)
@@ -44,14 +43,18 @@ function Player:addToCollider(collider)
 end
 
 function Player:draw()
+    -- Active arc
     self.active:draw()
+    -- Trail
     for i = 1, #self.trail do
         self.trail[i]:draw()
     end
+    -- Status
+    self.status:draw(self.active:rads() + math.pi)
 end
 
 function Player:won()
-    self.wins = self.wins + 1
+    self.status:addWin()
 end
 
 function Player:reset(arc)
