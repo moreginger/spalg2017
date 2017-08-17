@@ -17,10 +17,6 @@ function Player:update(dt)
     end
 end
 
-function exit()
-   love.timer.sleep(600)
-end
-
 function Player:detectCollision(collider)
     for shape, delta in pairs(collider:collisions(self.active.co)) do
         if self.active.player == shape.arc.player and math.abs(self.active:rads() - shape.arc:rads()) <= math.pi then
@@ -44,7 +40,9 @@ end
 
 function Player:draw()
     -- Active arc
-    self.active:draw()
+    local active = self.active
+    active:draw()
+    active:drawEndDot()
     -- Trail
     for i = 1, #self.trail do
         self.trail[i]:draw()

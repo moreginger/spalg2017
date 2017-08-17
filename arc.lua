@@ -87,6 +87,10 @@ function Arc:draw()
     love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
+function Arc:drawEndDot()
+    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.radius / 10)
+end
+
 function Arc:new(o)
     o = o or {}
     setmetatable(o, self)
