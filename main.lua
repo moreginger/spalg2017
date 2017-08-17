@@ -12,7 +12,7 @@ function love.load()
     screen_x, screen_y, flags = love.window.getMode()
 	radius = math.min(screen_x, screen_y) / 16
 
-    status_font = love.graphics.newFont(radius)
+    status_font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius)
     players = {}
     players[1] = Player:new({ status = Status:new({ display_x = 50, display_y = 50, font = status_font}) })
     players[2] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = screen_y - 50, font = status_font}) })
