@@ -3,7 +3,9 @@ require 'arc'
 Player = {
     active = Arc:new(),
     trail = {
-    }
+    },
+    alive = true,
+    wins = 0
 }
 
 function Player:update(dt)
@@ -26,7 +28,7 @@ function Player:detectCollision(collider)
             -- Impossible to collide with own line if < half circle direction change
             -- Needed to stop insta-collisions on direction change
         elseif self.active:intersectsArc(shape.arc) then
-            exit()
+            self.alive = false
         end
     end
 end
@@ -46,6 +48,16 @@ function Player:draw()
     for i = 1, #self.trail do
         self.trail[i]:draw()
     end
+end
+
+function Player:won()
+    self.wins = self.wins + 1
+end
+
+function Player:reset(arc)
+    self.active = arc
+    self.trail = {}
+    self.alive = true
 end
 
 function Player:new (o)

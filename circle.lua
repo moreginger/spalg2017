@@ -1,5 +1,6 @@
 
 -- Return intersect angles in radians where 0 = right, pi/2 = down etc.
+-- Adapted from https://github.com/williamfiset/Algorithms/blob/master/Geometry/CircleCircleIntersectionPoints.js
 function intersectAngles(c1, c2)
 
     r1 = c1.radius

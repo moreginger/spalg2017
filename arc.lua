@@ -13,11 +13,7 @@ Arc = {
 }
 
 function Arc:update(dt)
-    if self.direction == 'acw' then
-       self.end_rads = self.end_rads + dt * 4
-    else
-       self.end_rads = self.end_rads - dt * 4
-    end
+    self.end_rads = self.end_rads + (self.direction == 'acw' and dt * 2 or -dt * 2)
 end
 
 function Arc:changeDirection()
@@ -54,7 +50,6 @@ function Arc:intersectsArc(other)
             if debug then
                 print('overlap found!')
             end
-            gameIsPaused = true
             return true
         end
     else
@@ -68,7 +63,6 @@ function Arc:intersectsArc(other)
                 if debug then
                     print('intersect found!')
                 end
-                gameIsPaused = true
                 return true
             end
         end
