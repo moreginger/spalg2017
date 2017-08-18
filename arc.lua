@@ -20,9 +20,10 @@ function Arc:changeDirection()
     dx = math.cos(self.end_rads) * self.radius * 2
     dy = math.sin(self.end_rads) * self.radius * 2
     start_rads = self.end_rads + (self.direction == 'acw' and math.pi or -math.pi)
-    new_arc = self:new({
+    new_arc = Arc:new({
         x = self.x + dx,
         y = self.y + dy,
+        radius = self.radius,
         start_rads = start_rads,
         end_rads = start_rads,
         direction = self.direction == 'acw' and 'cw' or 'acw',
