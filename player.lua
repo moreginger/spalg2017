@@ -4,7 +4,8 @@ Player = {
     active = nil,
     trail = nil,
     alive = true,
-    status = nil
+    status = nil,
+    control = nil
 }
 
 function Player:update(dt)
@@ -28,7 +29,19 @@ function Player:detectCollision(collider)
     end
 end
 
-function Player:changeDirection(collider)
+function Player:keypressed(key, collider)
+    if self.control:isChangeDirectionKey(key) then
+        self:_changeDirection(collider)
+    end
+end
+
+function Player:touchpressed(x, y, collider)
+    if self.control:isChangeDirectionTouch(x, y) then
+        self:_changeDirection(collider)
+    end
+end
+
+function Player:_changeDirection(collider)
     self.trail[#self.trail+1] = self.active
     self.active = self.active:changeDirection()
     self:addToCollider(collider)

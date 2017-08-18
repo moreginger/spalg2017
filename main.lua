@@ -1,10 +1,12 @@
 require 'test'
 
 require 'arc'
+require 'control'
 require 'player'
 require 'status'
 
 HC = require 'hc'
+shapes = require 'hc.shapes'
 
 function love.load()
     test()
@@ -12,26 +14,51 @@ function love.load()
     screen_x, screen_y, flags = love.window.getMode()
 	local radius = math.min(screen_x, screen_y) / 16
 
-    local status_font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius)
-    players = {}
+    local touch_x = screen_x / 3
+    local touch_y = screen_y / 3
+    local function touchBox(x, y)
+        local box = shapes.newPolygonShape(0, 0, touch_x, 0, touch_x, touch_y, 0, touch_y)
+        box:moveTo(x + touch_x / 2, y + touch_y / 2) -- 0, 0 is center
+        return box
+    end
+
+    local status = Status:new({ font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius) })
     local arc = Arc:new({radius = radius})
-    players[1] = Player:new({ status = Status:new({ display_x = 50, display_y = 50, font = status_font}), active = arc:new({player = 1}) })
-    players[2] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = 50, font = status_font}), active = arc:new({player = 2}) })
-    players[3] = Player:new({ status = Status:new({ display_x = screen_x - 50, display_y = screen_y - 50, font = status_font}), active = arc:new({player = 3}) })
-    players[4] = Player:new({ status = Status:new({ display_x = 50, display_y = screen_y - 50, font = status_font}), active = arc:new({player = 4}) })
+
+    players = {}
+    players[1] = Player:new({
+        control = Control:new({ key = 'q', region = touchBox(0, 0) }),
+        status = status:new({ display_x = 50, display_y = 50 }),
+        active = arc:new({player = 1})
+    })
+    players[2] = Player:new({
+        control = Control:new({ key = 'p', region = touchBox(screen_x - touch_x, 0) }),
+        status = status:new({ display_x = screen_x - 50, display_y = 50 }),
+        active = arc:new({player = 2})
+    })
+    players[3] = Player:new({
+        control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
+        status = status:new({ display_x = screen_x - 50, display_y = screen_y - 50 }),
+        active = arc:new({player = 3}) }
+    )
+    players[4] = Player:new({
+        control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
+        status = status:new({ display_x = 50, display_y = screen_y - 50 }),
+        active = arc:new({player = 4})
+    })
     _reset()
 end
 
 function love.keypressed(key, scan_code, is_repeat)
-   if key == 'q' then
-       players[1]:changeDirection(collider)
-   elseif key == 'p' then
-       players[2]:changeDirection(collider)
-    elseif key == '.' then
-       players[3]:changeDirection(collider)
-    elseif key == 'z' then
-       players[4]:changeDirection(collider)
-   end
+    for i = 1, #players do
+       players[i]:keypressed(key, collider)
+    end
+end
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+    for i = 1, #players do
+       players[i]:touchpressed(x, y, collider)
+    end
 end
 
 function love.focus(f)
