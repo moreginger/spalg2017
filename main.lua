@@ -100,7 +100,8 @@ function _reset()
     map_radius = math.min(screen_x, screen_y) / 2
     map_x = screen_x / 2
     map_y = screen_y / 2
-    map = Arc:new({ x = map_x, y = map_y, radius = map_radius, end_rads = math.pi * 2, direction = 'acw', player = 0 })
+    -- total_rads at least 2pi less than 0 so that lines will collide :)
+    map = Arc:new({ x = map_x, y = map_y, radius = map_radius, end_rads = math.pi * 2, total_rads = -10, direction = 'acw', player = 0 })
     map:addToCollider(collider)
 
     for i = 1, #players do

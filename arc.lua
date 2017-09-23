@@ -8,12 +8,15 @@ Arc = {
     radius = 0,
     start_rads = 0,
     end_rads = 0,
+    total_rads = 0,
     direction = 'acw',
     player = 0
 }
 
 function Arc:update(dt)
-    self.end_rads = self.end_rads + (self.direction == 'acw' and dt * 2 or -dt * 2)
+    local delta = dt * 2
+    self.total_rads = self.total_rads + delta
+    self.end_rads = self.end_rads + (self.direction == 'acw' and delta or -delta)
 end
 
 function Arc:changeDirection()
@@ -26,6 +29,7 @@ function Arc:changeDirection()
         radius = self.radius,
         start_rads = start_rads,
         end_rads = start_rads,
+        total_rads = self.total_rads,
         direction = self.direction == 'acw' and 'cw' or 'acw',
         player = self.player
     })
@@ -44,9 +48,13 @@ function Arc:rads()
 end
 
 function Arc:intersectsArc(other)
+    local arc_delta = self.end_rads - self.start_rads
+    if self == other then
+        return math.abs(arc_delta) > math.pi * 2
+    end
     intersect_angles = intersectAngles(self, other)
     if intersect_angles == nil then
-        -- overlapping (probably self)
+        -- overlapping (should not happen)
         if isBetween(other.start_rads, other.end_rads, self.end_rads) then
             if debug then
                 print('overlap found!')
@@ -57,10 +65,25 @@ function Arc:intersectsArc(other)
         for i, angles in pairs(intersect_angles) do
             if debug then
                 print('testing arcs')
-                print('[' .. self.x .. ',' .. self.y .. ',' .. self.radius .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
+                print('[' .. self.player .. ',' .. self.x .. ',' .. self.y .. ',' .. self.radius .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
                 print('[' .. other.x .. ',' .. other.y .. ',' .. other.radius .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
             end
-            if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
+            local start_rads = self.start_rads
+            if self.player == other.player then
+                local start_rads_adj = other.total_rads + (math.pi * 2) - self.total_rads
+                if debug then
+                    print('own trail adj')
+                    print('[' .. self.total_rads .. ',' .. other.total_rads .. ',' .. start_rads_adj .. ',' .. arc_delta .. ']')
+                end
+                if start_rads_adj > math.abs(arc_delta) then
+                    -- Haven't travelled far enough to hit own trail yet.
+                    return false
+                end
+                if start_rads_adj > 0 then
+                    start_rads = start_rads + start_rads_adj * math.sign(arc_delta)
+                end
+            end
+            if isBetween(start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
                 if debug then
                     print('intersect found!')
                 end
@@ -97,4 +120,8 @@ function Arc:new(o)
     setmetatable(o, self)
     self.__index = self
     return o
+end
+
+function math.sign(n)
+    return n > 0 and 1 or n < 0 and -1 or 0
 end
