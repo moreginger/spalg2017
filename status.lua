@@ -2,12 +2,14 @@ Status = {
     wins = 0,
     display_x = 0,
     display_y = 0,
+    display_w = 0,
+    display_h = 0,
     font = nil
 }
 
 function Status:draw(angle)
     love.graphics.setFont(self.font)
-    love.graphics.printf(self.wins, self.display_x, self.display_y, 100, 'center', angle, 1, 1, 50, 10)
+    love.graphics.printf(self.wins, self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
 end
 
 function Status:addWin()

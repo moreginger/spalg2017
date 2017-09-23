@@ -22,28 +22,31 @@ function love.load()
         return box
     end
 
-    local status = Status:new({ font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', radius) })
+    local font_size = radius * 1.5
+    local display_offset = radius * 2;
+    local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
+    local status = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
     local arc = Arc:new({radius = radius})
 
     players = {}
     players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = status:new({ display_x = 50, display_y = 50 }),
+        status = status:new({ display_x = display_offset, display_y = display_offset }),
         active = arc:new({player = 1})
     })
     players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(screen_x - touch_x, 0) }),
-        status = status:new({ display_x = screen_x - 50, display_y = 50 }),
+        status = status:new({ display_x = screen_x - display_offset, display_y = display_offset }),
         active = arc:new({player = 2})
     })
     players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
-        status = status:new({ display_x = screen_x - 50, display_y = screen_y - 50 }),
+        status = status:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 3}) }
     )
     players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
-        status = status:new({ display_x = 50, display_y = screen_y - 50 }),
+        status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4})
     })
     _reset()
