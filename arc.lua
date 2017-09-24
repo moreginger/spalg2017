@@ -47,12 +47,28 @@ function Arc:rads()
     return self.direction == 'acw' and self.end_rads or self.end_rads - math.pi
 end
 
-function Arc:intersectsArc(other)
+-- Return new arc with the portion before 'total_rads' is reached trimmed.
+-- Return nil if this leaves no arc.
+-- Used in collision detection to avoid immediate "collision" with previous path segment.
+function Arc:withTrimmedStart(total_rads)
     local arc_delta = self.end_rads - self.start_rads
-    if self == other then
-        return math.abs(arc_delta) > math.pi * 2
+    local start_rads_adj = total_rads - self.total_rads
+    if start_rads_adj > math.abs(arc_delta) then
+        return nil
+    elseif start_rads_adj <= 0 then
+        return self
     end
-    intersect_angles = intersectAngles(self, other)
+    local start_rads = self.start_rads + start_rads_adj * math.sign(arc_delta)
+    return self:new({ start_rads = start_rads })
+end
+
+function Arc:intersectsSelf()
+    local arc_delta = self.end_rads - self.start_rads
+    return math.abs(arc_delta) >= math.pi * 2
+end
+
+function Arc:intersectsArc(other)
+    local intersect_angles = intersectAngles(self, other)
     if intersect_angles == nil then
         -- overlapping (should not happen)
         if isBetween(other.start_rads, other.end_rads, self.end_rads) then
@@ -66,24 +82,9 @@ function Arc:intersectsArc(other)
             if debug then
                 print('testing arcs')
                 print('[' .. self.player .. ',' .. self.x .. ',' .. self.y .. ',' .. self.radius .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
-                print('[' .. other.x .. ',' .. other.y .. ',' .. other.radius .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
+                print('[' .. other.player .. ',' .. other.x .. ',' .. other.y .. ',' .. other.radius .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
             end
-            local start_rads = self.start_rads
-            if self.player == other.player then
-                local start_rads_adj = other.total_rads + (math.pi * 2) - self.total_rads
-                if debug then
-                    print('own trail adj')
-                    print('[' .. self.total_rads .. ',' .. other.total_rads .. ',' .. start_rads_adj .. ',' .. arc_delta .. ']')
-                end
-                if start_rads_adj > math.abs(arc_delta) then
-                    -- Haven't travelled far enough to hit own trail yet.
-                    return false
-                end
-                if start_rads_adj > 0 then
-                    start_rads = start_rads + start_rads_adj * math.sign(arc_delta)
-                end
-            end
-            if isBetween(start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
+            if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
                 if debug then
                     print('intersect found!')
                 end

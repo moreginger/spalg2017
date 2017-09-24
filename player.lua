@@ -13,13 +13,19 @@ function Player:update(dt)
 end
 
 function Player:detectCollision(collider)
-    for shape, delta in pairs(collider:collisions(self.active.co)) do
-        if self.active:intersectsArc(shape.arc) then
-            self.alive = false
-        end
-    end
-    if self.active:intersectsArc(self.active) then
+    if self.active:intersectsSelf() then
       self.alive = false
+    else
+        for shape, delta in pairs(collider:collisions(self.active.co)) do
+            local arc = self.active
+            local other = shape.arc
+            if arc.player == other.player then
+                arc = arc:withTrimmedStart(other.total_rads + math.pi * 2)
+            end
+            if arc ~= nil and arc:intersectsArc(other) then
+                self.alive = false
+            end
+        end
     end
 end
 
