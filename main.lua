@@ -28,6 +28,10 @@ function love.load()
     local status = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
     local arc = Arc:new({radius = radius})
 
+    world = {
+        dt_speedup = 1
+    }
+
     players = {}
     players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
@@ -70,11 +74,12 @@ end
 
 function love.update(dt)
     if gameIsPaused then return end
+    local dr = dt * world.dt_speedup
     active = 0
     for i = 1, #players do
         if players[i].alive then
             active = active + 1
-            players[i]:update(dt, collider)
+            players[i]:update(dr, collider)
             players[i]:detectCollision(collider)
         end
     end
@@ -83,6 +88,9 @@ function love.update(dt)
             if players[i].alive then
                 players[i]:won()
             end
+        end
+        if active == 1 then
+            world.dt_speedup = world.dt_speedup + (4 - world.dt_speedup) / 16
         end
         _reset()
     end

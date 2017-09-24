@@ -8,8 +8,8 @@ Player = {
     control = nil
 }
 
-function Player:update(dt)
-    self.active:update(dt)
+function Player:update(dr)
+    self.active:update(dr)
 end
 
 function Player:detectCollision(collider)
