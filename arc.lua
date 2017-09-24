@@ -16,7 +16,7 @@ Arc = {
 function Arc:update(dt)
     local delta = dt * 2
     self.total_rads = self.total_rads + delta
-    self.end_rads = self.end_rads + (self.direction == 'acw' and delta or -delta)
+    self.end_rads = self.end_rads + (self.direction == 'acw' and -delta or delta)
 end
 
 function Arc:changeDirection()

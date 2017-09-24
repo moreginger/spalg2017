@@ -110,7 +110,8 @@ function _reset()
     end
 
     local function _resetActive(player, angle)
-        player.active = Arc:new({ x = map_x + math.cos(angle) * map_radius * 3 / 4, y = map_y + math.sin(angle) * map_radius * 3 / 4, radius = player.active.radius, start_rads = angle, end_rads = angle, direction = 'acw', player = player.active.player })
+        local r = map_radius * 0.7
+        player.active = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
     end
     _resetActive(players[1], math.pi * 5 / 4)
     _resetActive(players[2], math.pi * 7 / 4)
