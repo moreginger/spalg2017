@@ -74,9 +74,12 @@ function Arc:intersectsArc(other)
             if debug then
                 print('overlap found!')
             end
-            return true
+            return 1
+        else
+            return 0
         end
     else
+        local intersects = 0;
         for i, angles in pairs(intersect_angles) do
             if debug then
                 print('testing arcs')
@@ -87,11 +90,11 @@ function Arc:intersectsArc(other)
                 if debug then
                     print('intersect found!')
                 end
-                return true
+                intersects = intersects + 1
             end
         end
+        return intersects
     end
-    return false
 end
 
 function isBetween(start_rads, end_rads, query_rads)

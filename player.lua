@@ -12,7 +12,7 @@ function Player:update(dr)
     self.active:update(dr)
 end
 
-function Player:detectCollision(collider)
+function Player:detectCollision(collider, dr)
     if self.active:intersectsSelf() then
       self.alive = false
     else
@@ -22,8 +22,16 @@ function Player:detectCollision(collider)
             if arc.player == other.player then
                 arc = arc:withTrimmedStart(other.total_rads + math.pi * 2)
             end
-            if arc ~= nil and arc:intersectsArc(other) then
-                self.alive = false
+            if arc ~= nil then
+                local intersects = arc:intersectsArc(other)
+                if intersects > 0 then
+                    -- OK arcs intersect but who hit who?
+                    local regressedArc = arc:new()
+                    regressedArc:update(-dr)
+                    if intersects ~= regressedArc:intersectsArc(other) then
+                        self.alive = false
+                    end
+                end
             end
         end
     end

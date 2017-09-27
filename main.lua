@@ -79,8 +79,8 @@ function love.update(dt)
     for i = 1, #players do
         if players[i].alive then
             active = active + 1
-            players[i]:update(dr, collider)
-            players[i]:detectCollision(collider)
+            players[i]:update(dr)
+            players[i]:detectCollision(collider, dr)
         end
     end
     if active <= 1 then
