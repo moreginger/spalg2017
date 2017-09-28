@@ -12,6 +12,8 @@ function love.load()
     test()
 
     screen_x, screen_y, flags = love.window.getMode()
+    map_x = screen_x / 2
+    map_y = screen_y / 2
 	local radius = math.min(screen_x, screen_y) / 16
 
     local touch_x = screen_x / 3
@@ -60,7 +62,8 @@ function love.load()
         status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4})
     })
-    _reset()
+    _resetMap()
+    _resetPlayers()
 end
 
 function love.keypressed(key, scan_code, is_repeat)
@@ -85,6 +88,9 @@ function love.update(dt)
     if world.map.alive then
       world.map.arc:update(4 * dr)
       world.map.alive = not world.map.arc:intersectsSelf()
+      if not world.map.alive then
+        _resetPlayers()
+      end
       return
     else
         active = 0
@@ -104,7 +110,7 @@ function love.update(dt)
             if active == 1 then
                 world.dt_speedup = world.dt_speedup + 0.1
             end
-            _reset()
+            _resetMap()
         end
     end
 end
@@ -119,18 +125,19 @@ function love.draw()
     end
 end
 
-function _reset()
+function _resetMap()
     world.round = world.round + 1
 
     collider = HC.new(100)
-    map_x = screen_x / 2
-    map_y = screen_y / 2
-    -- total_rads at least 2pi less than 0 so that lines will collide :)
+
+    -- total_rads at least 2pi less than 0 so that lines will definitely collide :)
     local map_start_rads = (3 + world.round % 4 * 2) * math.pi / 4
     world.map.arc = Arc:new({ x = map_x, y = map_y, radius = world.map.arc.radius, dot_radius = world.map.arc.dot_radius, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
     world.map.arc:addToCollider(collider)
     world.map.alive = true
+end
 
+function _resetPlayers()
     for i = 1, #players do
         players[i].alive = true
         players[i].trail = {}
