@@ -6,6 +6,7 @@ Arc = {
     x = 0,
     y = 0,
     radius = 0,
+    dot_radius = 0,
     start_rads = 0,
     end_rads = 0,
     total_rads = 0,
@@ -26,6 +27,7 @@ function Arc:changeDirection()
         x = self.x + dx,
         y = self.y + dy,
         radius = self.radius,
+        dot_radius = self.dot_radius,
         start_rads = start_rads,
         end_rads = start_rads,
         total_rads = self.total_rads,
@@ -115,7 +117,7 @@ function Arc:draw()
 end
 
 function Arc:drawEndDot()
-    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.radius / 10)
+    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius)
 end
 
 function Arc:new(o)

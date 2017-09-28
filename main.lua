@@ -26,10 +26,17 @@ function love.load()
     local display_offset = radius * 2;
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     local status = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
-    local arc = Arc:new({radius = radius})
 
+    local arc = Arc:new({radius = radius, dot_radius = radius / 8})
+
+    local map_radius = math.min(screen_x, screen_y) / 2.1
     world = {
-        dt_speedup = 1
+        dt_speedup = 1,
+        round = 0,
+        map = {
+            arc =  Arc:new({radius = map_radius, dot_radius = radius / 8}),
+            alive = false
+        }
     }
 
     players = {}
@@ -75,24 +82,30 @@ end
 function love.update(dt)
     if gameIsPaused then return end
     local dr = dt * world.dt_speedup
-    active = 0
-    for i = 1, #players do
-        if players[i].alive then
-            active = active + 1
-            players[i]:update(dr)
-            players[i]:detectCollision(collider, dr)
-        end
-    end
-    if active <= 1 then
+    if world.map.alive then
+      world.map.arc:update(4 * dr)
+      world.map.alive = not world.map.arc:intersectsSelf()
+      return
+    else
+        active = 0
         for i = 1, #players do
             if players[i].alive then
-                players[i]:won()
+                active = active + 1
+                players[i]:update(dr)
+                players[i]:detectCollision(collider, dr)
             end
         end
-        if active == 1 then
-            world.dt_speedup = world.dt_speedup + (4 - world.dt_speedup) / 16
+        if active <= 1 then
+            for i = 1, #players do
+                if players[i].alive then
+                    players[i]:won()
+                end
+            end
+            if active == 1 then
+                world.dt_speedup = world.dt_speedup + 0.1
+            end
+            _reset()
         end
-        _reset()
     end
 end
 
@@ -100,17 +113,23 @@ function love.draw()
     for i = 1, #players do
        players[i]:draw()
     end
-    map:draw()
+    world.map.arc:draw()
+    if world.map.alive then
+      world.map.arc:drawEndDot()
+    end
 end
 
 function _reset()
+    world.round = world.round + 1
+
     collider = HC.new(100)
-    map_radius = math.min(screen_x, screen_y) / 2
     map_x = screen_x / 2
     map_y = screen_y / 2
     -- total_rads at least 2pi less than 0 so that lines will collide :)
-    map = Arc:new({ x = map_x, y = map_y, radius = map_radius, end_rads = math.pi * 2, total_rads = -10, direction = 'acw', player = 0 })
-    map:addToCollider(collider)
+    local map_start_rads = (3 + world.round % 4 * 2) * math.pi / 4
+    world.map.arc = Arc:new({ x = map_x, y = map_y, radius = world.map.arc.radius, dot_radius = world.map.arc.dot_radius, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
+    world.map.arc:addToCollider(collider)
+    world.map.alive = true
 
     for i = 1, #players do
         players[i].alive = true
@@ -118,8 +137,8 @@ function _reset()
     end
 
     local function _resetActive(player, angle)
-        local r = map_radius * 0.7
-        player.active = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
+        local r = world.map.arc.radius * 0.7
+        player.active = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, dot_radius = player.active.dot_radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
     end
     _resetActive(players[1], math.pi * 5 / 4)
     _resetActive(players[2], math.pi * 7 / 4)
