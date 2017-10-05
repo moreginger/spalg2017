@@ -8,66 +8,17 @@ require 'status'
 HC = require 'hc'
 shapes = require 'hc.shapes'
 
-local game = {
-  world = {
-    dt_speedup = 1,
-    round = 0,
-    map = {
-      alive = false
-    }
-  },
-  players = {}
-}
+local game = {}
 
 function game:load()
-    -- test()
+end
 
-    screen_x, screen_y, flags = love.window.getMode()
-    map_x = screen_x / 2
-    map_y = screen_y / 2
-	local radius = math.min(screen_x, screen_y) / 16
-
-    local touch_x = screen_x / 3
-    local touch_y = screen_y / 3
-    local function touchBox(x, y)
-        local box = shapes.newPolygonShape(0, 0, touch_x, 0, touch_x, touch_y, 0, touch_y)
-        box:moveTo(x + touch_x / 2, y + touch_y / 2) -- 0, 0 is center
-        return box
-    end
-
-    local font_size = radius * 1.5
-    local display_offset = radius * 2;
-    local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
-    local status = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
-
-    local arc = Arc:new({radius = radius, dot_radius = radius / 8})
-
-    local map_radius = math.min(screen_x, screen_y) / 2.1
-    self.world.map.arc = Arc:new({radius = map_radius, dot_radius = radius / 8})
-
-    local players = self.players
-    players[1] = Player:new({
-        control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = status:new({ display_x = display_offset, display_y = display_offset }),
-        active = arc:new({player = 1})
-    })
-    players[2] = Player:new({
-        control = Control:new({ key = 'p', region = touchBox(screen_x - touch_x, 0) }),
-        status = status:new({ display_x = screen_x - display_offset, display_y = display_offset }),
-        active = arc:new({player = 2})
-    })
-    players[3] = Player:new({
-        control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
-        status = status:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
-        active = arc:new({player = 3}) }
-    )
-    players[4] = Player:new({
-        control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
-        status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
-        active = arc:new({player = 4})
-    })
-    self:_resetMap()
-    self:_resetPlayers()
+function game:enter(init)
+    self.env = init.env
+    self.players = init.players
+    self.map = init.map
+    self:_resetMap() 
+    self:_resetPlayers() 
 end
 
 function game:keypressed(key, scan_code, is_repeat)
@@ -90,13 +41,12 @@ end
 
 function game:update(dt)
     if gameIsPaused then return end
-    local world = self.world
     local players = self.players
-    local dr = dt * self.world.dt_speedup
-    if world.map.alive then
-      world.map.arc:update(4 * dr)
-      world.map.alive = not world.map.arc:intersectsSelf()
-      if not world.map.alive then
+    local dr = dt * self.env.dt_speedup
+    if self.map.alive then
+      self.map.arc:update(4 * dr)
+      self.map.alive = not self.map.arc:intersectsSelf()
+      if not self.map.alive then
         game:_resetPlayers()
       end
       return
@@ -116,7 +66,7 @@ function game:update(dt)
                 end
             end
             if active == 1 then
-                world.dt_speedup = world.dt_speedup + 0.1
+                self.env.dt_speedup = self.env.dt_speedup + 0.1
             end
             game:_resetMap()
         end
@@ -124,28 +74,26 @@ function game:update(dt)
 end
 
 function game:draw()
-    local world = self.world
-    local players = self.players
-    for i = 1, #players do
-       players[i]:draw()
+    for i = 1, #self.players do
+       self.players[i]:draw()
     end
-    world.map.arc:draw()
-    if world.map.alive then
-      world.map.arc:drawEndDot()
+    self.map.arc:draw()
+    if self.map.alive then
+      self.map.arc:drawEndDot()
     end
 end
 
 function game:_resetMap()
-    local world = self.world
-    world.round = world.round + 1
+    self.env.round = self.env.round + 1
 
     collider = HC.new(100)
 
     -- total_rads at least 2pi less than 0 so that lines will definitely collide :)
-    local map_start_rads = (3 + world.round % 4 * 2) * math.pi / 4
-    world.map.arc = Arc:new({ x = map_x, y = map_y, radius = world.map.arc.radius, dot_radius = world.map.arc.dot_radius, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
-    world.map.arc:addToCollider(collider)
-    world.map.alive = true
+    local map_start_rads = (3 + self.env.round % 4 * 2) * math.pi / 4
+    local arc = self.map.arc
+    self.map.arc = Arc:new({ x = arc.x, y = arc.y, radius = arc.radius, dot_radius = arc.dot_radius, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
+    self.map.arc:addToCollider(collider)
+    self.map.alive = true
 end
 
 function game:_resetPlayers()
@@ -156,7 +104,8 @@ function game:_resetPlayers()
     end
 
     local function _resetActive(player, angle)
-        local r = self.world.map.arc.radius * 0.7
+        local map_x, map_y = self.map.arc.x, self.map.arc.y
+        local r = self.map.arc.radius * 0.7
         player.active = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, dot_radius = player.active.dot_radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
     end
     _resetActive(players[1], math.pi * 5 / 4)
