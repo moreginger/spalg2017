@@ -2,6 +2,7 @@ require 'arc'
 
 Player = {
     active = nil,
+    playing = false,
     trail = {},
     alive = true,
     status = nil,
@@ -50,6 +51,7 @@ function Player:touchpressed(x, y, collider)
 end
 
 function Player:_changeDirection(collider)
+    self.playing = true
     self.trail[#self.trail+1] = self.active
     self.active = self.active:changeDirection()
     self:addToCollider(collider)
@@ -80,6 +82,7 @@ end
 
 function Player:reset(arc)
     self.active = arc
+    self.playing = false
     self.trail = {}
     self.alive = true
 end

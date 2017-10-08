@@ -9,11 +9,11 @@ require 'control'
 require 'player'
 require 'status'
 
-local pause = require 'states.pause'
-
+-- Main game state.
 local game = {}
 
 function game:enter(intermission)
+    self.states = intermission.states
     self.env = intermission.env
     self.players = intermission.players
     self.map = intermission.map
@@ -48,7 +48,7 @@ end
 function game:update(dt)
     local players = self.players
     local dr = dt * self.env.dt_speedup
-    active = 0
+    local active = 0
     for i = 1, #players do
         if players[i].alive then
             active = active + 1
@@ -57,12 +57,20 @@ function game:update(dt)
         end
     end
     if active <= 1 then
+        local playing = 0
         for i = 1, #players do
+            if players[i].playing then
+                playing = playing + 1
+            end
             if players[i].alive then
                 players[i]:won()
             end
         end
-        Gamestate.switch(self.state_intermission)
+        if playing == 0 then
+            Gamestate.switch(self.states.fin)
+        else
+            Gamestate.switch(self.state_intermission)
+        end
     end
 end
 
@@ -75,30 +83,22 @@ end
 
 function game:focus(focus)
     if not focus then
-        Gamestate.push(pause)
+        Gamestate.push(self.states.pause)
     end
 end
 
 function game:_resetPlayers()
-    local players = self.players
-    for i = 1, #players do
-        players[i].alive = true
-        players[i].trail = {}
-    end
-
     local function _resetActive(player, angle)
         local map_x, map_y = self.map.x, self.map.y
         local r = self.map.radius * 0.7
-        player.active = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, dot_radius = player.active.dot_radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
+        local arc = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, dot_radius = player.active.dot_radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
+        player:reset(arc)
+        player:addToCollider(self.collider)
     end
-    _resetActive(players[1], math.pi * 5 / 4)
-    _resetActive(players[2], math.pi * 7 / 4)
-    _resetActive(players[3], math.pi * 1 / 4)
-    _resetActive(players[4], math.pi * 3 / 4)
-
-    for i = 1, #players do
-        players[i]:addToCollider(self.collider)
-    end
+    _resetActive(self.players[1], math.pi * 5 / 4)
+    _resetActive(self.players[2], math.pi * 7 / 4)
+    _resetActive(self.players[3], math.pi * 1 / 4)
+    _resetActive(self.players[4], math.pi * 3 / 4)
 end
 
 return game

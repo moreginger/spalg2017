@@ -9,11 +9,16 @@ Status = {
 
 function Status:draw(angle)
     love.graphics.setFont(self.font)
-    love.graphics.printf(self.wins, self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
+    love.graphics.printf(math.floor(self.wins), self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
 end
 
 function Status:addWin()
     self.wins = self.wins + 1
+end
+
+function Status:subWins(wins)
+    self.wins = self.wins - wins
+    self.wins = self.wins < 0 and 0 or self.wins
 end
 
 function Status:new (o)

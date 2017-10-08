@@ -2,9 +2,6 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
-local game = require 'states.game'
-local pause = require 'states.pause'
-
 -- Short intermission between rounds
 local intermission = {
     name = 'intermission'
@@ -12,6 +9,7 @@ local intermission = {
 
 -- other = init or game.
 function intermission:enter(other)
+    self.states = other.states
     self.env = other.env
     self.map = other.map
     self.players = other.players
@@ -26,7 +24,7 @@ function intermission:update(dt)
     local dr = dt * self.env.dt_speedup
     self.map:update(4 * dr)
     if self.map:intersectsSelf() then
-        Gamestate.switch(game)
+        Gamestate.switch(self.states.game)
     end
 end
 
@@ -41,7 +39,7 @@ end
 
 function intermission:focus(focus)
     if not focus then
-        Gamestate.push(pause)
+        Gamestate.push(self.states.pause)
     end
 end
 

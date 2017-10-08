@@ -11,6 +11,9 @@ require 'player'
 require 'status'
 
 local intermission = require 'states.intermission'
+local game = require 'states.game'
+local fin = require 'states.fin'
+local pause = require 'states.pause'
 
 -- (re)initialize game state
 local init = {
@@ -19,10 +22,18 @@ local init = {
         round = 0
     },
     map = nil,
-    players = {}
+    players = {},
+    states = {}
 }
 
 function init:enter()
+    -- States object to avoid cyclical deps.
+    self.states.init = init
+    self.states.intermission = intermission
+    self.states.game = game
+    self.states.fin = fin
+    self.states.pause = pause
+
     local screen_x, screen_y, flags = love.window.getMode()
     local map_x = screen_x / 2
     local map_y = screen_y / 2
@@ -59,15 +70,15 @@ function init:enter()
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
         status = status:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
-        active = arc:new({player = 3}) }
-    )
+        active = arc:new({player = 3})
+    })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
         status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4})
     })
 
-    Gamestate.switch(intermission)
+    Gamestate.switch(self.states.intermission)
 end
 
 return init
