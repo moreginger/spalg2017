@@ -1,12 +1,15 @@
 package.path = "../?.lua;" .. package.path
 
-local HC = require 'hc'
 local Gamestate = require 'hump.gamestate'
+
+local HC = require 'hc'
 
 require 'arc'
 require 'control'
 require 'player'
 require 'status'
+
+local pause = require 'states.pause'
 
 local game = {}
 
@@ -18,22 +21,27 @@ function game:enter(intermission)
     self.state_intermission = intermission
 
     self.collider = HC.new(100)
-    self.map:addToCollider(collider)
+    self.map:addToCollider(self.collider)
 
     self:_resetPlayers()
+end
+
+function game:leave()
+    self.env.dt_speedup = self.env.dt_speedup + 0.1
+    self.env.round = self.env.round + 1
 end
 
 function game:keypressed(key, scan_code, is_repeat)
     local players = self.players
     for i = 1, #players do
-       players[i]:keypressed(key, collider)
+       players[i]:keypressed(key, self.collider)
     end
 end
 
 function game:touchpressed(id, x, y, dx, dy, pressure)
     local players = self.players
     for i = 1, #players do
-       players[i]:touchpressed(x, y, collider)
+       players[i]:touchpressed(x, y, self.collider)
     end
 end
 
@@ -45,7 +53,7 @@ function game:update(dt)
         if players[i].alive then
             active = active + 1
             players[i]:update(dr)
-            players[i]:detectCollision(collider, dr)
+            players[i]:detectCollision(self.collider, dr)
         end
     end
     if active <= 1 then
@@ -65,9 +73,10 @@ function game:draw()
     self.map:draw()
 end
 
-function game:leave()
-    self.env.dt_speedup = self.env.dt_speedup + 0.1
-    self.env.round = self.env.round + 1
+function game:focus(focus)
+    if not focus then
+        Gamestate.push(pause)
+    end
 end
 
 function game:_resetPlayers()
@@ -88,7 +97,7 @@ function game:_resetPlayers()
     _resetActive(players[4], math.pi * 3 / 4)
 
     for i = 1, #players do
-        players[i]:addToCollider(collider)
+        players[i]:addToCollider(self.collider)
     end
 end
 

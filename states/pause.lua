@@ -18,3 +18,5 @@ function pause:focus(f)
         Gamestate.pop()
     end
 end
+
+return pause
