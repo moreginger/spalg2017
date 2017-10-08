@@ -26,7 +26,7 @@ local init = {
     states = {}
 }
 
-function init:enter()
+function init:init()
     -- States object to avoid cyclical deps.
     self.states.init = init
     self.states.intermission = intermission
@@ -35,9 +35,19 @@ function init:enter()
     self.states.pause = pause
 
     local screen_x, screen_y, flags = love.window.getMode()
+    local radius = math.min(screen_x, screen_y) / 16
+
+    local font_size = radius * 1.5
+    local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
+    self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
+end
+
+function init:enter()
+    -- TODO don't duplicate code with init.
+    local screen_x, screen_y, flags = love.window.getMode()
+	local radius = math.min(screen_x, screen_y) / 16
     local map_x = screen_x / 2
     local map_y = screen_y / 2
-	local radius = math.min(screen_x, screen_y) / 16
 
     local touch_x = screen_x / 3
     local touch_y = screen_y / 3
@@ -47,10 +57,7 @@ function init:enter()
         return box
     end
 
-    local font_size = radius * 1.5
     local display_offset = radius * 2;
-    local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
-    local status = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
     local arc = Arc:new({x = -radius, y = -radius, radius = radius, dot_radius = radius / 8})
 
@@ -59,22 +66,22 @@ function init:enter()
 
     self.players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = status:new({ display_x = display_offset, display_y = display_offset }),
+        status = self.status_tmpl:new({ display_x = display_offset, display_y = display_offset }),
         active = arc:new({player = 1})
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(screen_x - touch_x, 0) }),
-        status = status:new({ display_x = screen_x - display_offset, display_y = display_offset }),
+        status = self.status_tmpl:new({ display_x = screen_x - display_offset, display_y = display_offset }),
         active = arc:new({player = 2})
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
-        status = status:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
+        status = self.status_tmpl:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 3})
     })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
-        status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
+        status = self.status_tmpl:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4})
     })
 
