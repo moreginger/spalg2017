@@ -38,7 +38,7 @@ function Arc:changeDirection()
 end
 
 function Arc:addToCollider(collider)
-    co = collider:circle(self.x, self.y, self.radius)
+    local co = collider:circle(self.x, self.y, self.radius)
     co.arc = self
     -- Hard reference to collider object needed to stop GC
     self.co = co

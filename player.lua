@@ -2,7 +2,7 @@ require 'arc'
 
 Player = {
     active = nil,
-    trail = nil,
+    trail = {},
     alive = true,
     status = nil,
     control = nil

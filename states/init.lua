@@ -1,23 +1,27 @@
 package.path = "../?.lua;" .. package.path
 
+local Gamestate = require 'hump.gamestate'
+
+local shapes = require 'hc.shapes'
+
 require 'arc'
 require 'control'
 require 'player'
 require 'status'
 
+local intermission = require 'states.intermission'
+
+-- (re)initialize game state
 local init = {
     env = {
         dt_speedup = 1,
         round = 0
     },
-    map = {
-        arc = nil,
-        alive = false
-    },
+    map = nil,
     players = {}
 }
 
-function init:load()
+function init:enter()
     local screen_x, screen_y, flags = love.window.getMode()
     local map_x = screen_x / 2
     local map_y = screen_y / 2
@@ -39,7 +43,7 @@ function init:load()
     local arc = Arc:new({radius = radius, dot_radius = radius / 8})
 
     local map_radius = math.min(screen_x, screen_y) / 2.1 -- Fit onscreen
-    self.map.arc = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = radius / 8})
+    self.map = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = radius / 8})
 
     local players = self.players
     players[1] = Player:new({
@@ -62,6 +66,8 @@ function init:load()
         status = status:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4})
     })
+
+    Gamestate.switch(intermission)
 end
 
 return init

@@ -1,15 +1,18 @@
 Gamestate = require 'hump.gamestate'
 
-init = require 'states.init'
-game = require 'game'
+local init = require 'states.init'
+local pause = require 'states.pause'
 
 require 'test'
 
 function love.load()
-  -- test()
-  init:load()
-  game:load()
-  Gamestate.registerEvents()
-  Gamestate.switch(init)
-  Gamestate.switch(game)
+    -- test()
+    Gamestate.registerEvents()
+    Gamestate.switch(init)
+end
+
+function love:focus(f)
+    if f then
+        -- Gamestate.push(pause)
+    end
 end
