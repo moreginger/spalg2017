@@ -2,7 +2,7 @@ Gamestate = require 'hump.gamestate'
 
 local init = require 'states.init'
 
-require 'test'
+-- require 'test'
 
 function love.load()
     -- test()

@@ -10,7 +10,7 @@ Arc = {
     start_rads = 0,
     end_rads = 0,
     total_rads = 0,
-    direction = 'acw',
+    direction = 'cw',
     player = 0
 }
 

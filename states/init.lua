@@ -64,25 +64,26 @@ function init:enter()
     local map_radius = math.min(screen_x, screen_y) / 2.05 -- Fit onscreen
     self.map = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = radius / 8})
 
+    -- TODO don't duplicate end_rads start position here.
     self.players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
         status = self.status_tmpl:new({ display_x = display_offset, display_y = display_offset }),
-        active = arc:new({player = 1})
+        active = arc:new({player = 1, end_rads = math.pi * 5 / 4})
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(screen_x - touch_x, 0) }),
         status = self.status_tmpl:new({ display_x = screen_x - display_offset, display_y = display_offset }),
-        active = arc:new({player = 2})
+        active = arc:new({player = 2, end_rads = math.pi * 7 / 4})
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(screen_x - touch_x, screen_y - touch_y) }),
         status = self.status_tmpl:new({ display_x = screen_x - display_offset, display_y = screen_y - display_offset }),
-        active = arc:new({player = 3})
+        active = arc:new({player = 3, end_rads = math.pi * 1 / 4})
     })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, screen_y - touch_y) }),
         status = self.status_tmpl:new({ display_x = display_offset, display_y = screen_y - display_offset }),
-        active = arc:new({player = 4})
+        active = arc:new({player = 4, end_rads = math.pi * 3 / 4})
     })
 
     Gamestate.switch(self.states.intermission)
