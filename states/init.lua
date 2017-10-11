@@ -52,8 +52,8 @@ function init:enter()
     local map_x = screen_x / 2
     local map_y = screen_y / 2
 
-    local touch_x = screen_x / 3
-    local touch_y = screen_y / 3
+    local touch_x = screen_x * 4 / 9
+    local touch_y = screen_y * 4 / 9
     local function touchBox(x, y)
         local box = shapes.newPolygonShape(0, 0, touch_x, 0, touch_x, touch_y, 0, touch_y)
         box:moveTo(x + touch_x / 2, y + touch_y / 2) -- 0, 0 is center
