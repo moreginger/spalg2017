@@ -43,6 +43,9 @@ function init:init()
 end
 
 function init:enter()
+    self.env.dt_speedup = 1
+    self.env.round = 0
+
     -- TODO don't duplicate code with init.
     local screen_x, screen_y, flags = love.window.getMode()
 	local radius = math.min(screen_x, screen_y) / 16
