@@ -10,6 +10,7 @@ local intermission = {
 -- other = init or game.
 function intermission:enter(other)
     self.states = other.states
+    self.shaders = other.shaders
     self.env = other.env
     self.map = other.map
     self.players = other.players
@@ -17,7 +18,7 @@ function intermission:enter(other)
     local map_start_rads = (3 + self.env.round % 4 * 2) * math.pi / 4
     local arc = self.map
     -- total_rads at least 2pi less than 0 so that lines will defotherely collide :)
-    self.map = Arc:new({ x = arc.x, y = arc.y, radius = arc.radius, dot_radius = arc.dot_radius, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
+    self.map = Arc:new({ x = arc.x, y = arc.y, radius = arc.radius, dot_radius = arc.dot_radius, width = arc.width, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, direction = 'cw', player = 0 })
 end
 
 function intermission:update(dt)
@@ -29,12 +30,18 @@ function intermission:update(dt)
 end
 
 function intermission:draw()
-    self.map:draw()
-    self.map:drawEndDot()
+    self.shaders.trail:draw(function()
+        self:_draw(self.shaders.cfg_trails)
+    end)
+    self:_draw(self.shaders.cfg_all)
+end
 
+function intermission:_draw(cfg)
     for i = 1, #self.players do
-       self.players[i]:draw()
+        self.players[i]:draw(cfg)
     end
+    self.map:draw()
+    self.map:drawEndDot(1)
 end
 
 function intermission:focus(focus)

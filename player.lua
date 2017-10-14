@@ -2,7 +2,7 @@ require 'arc'
 
 Player = {
     active = nil,
-    playing = false,
+    toggle_time = nil, -- Time since last direction change, or nil if none.
     trail = {},
     alive = true,
     status = nil,
@@ -11,6 +11,9 @@ Player = {
 
 function Player:update(dr)
     self.active:update(dr)
+    if self.toggle_time ~= nil then
+        self.toggle_time = self.toggle_time + dr * 4
+    end
 end
 
 function Player:detectCollision(collider, dr)
@@ -51,7 +54,7 @@ function Player:touchpressed(x, y, collider)
 end
 
 function Player:_changeDirection(collider)
-    self.playing = true
+    self.toggle_time = 0
     self.trail[#self.trail+1] = self.active
     self.active = self.active:changeDirection()
     self:addToCollider(collider)
@@ -61,28 +64,33 @@ function Player:addToCollider(collider)
     self.active:addToCollider(collider)
 end
 
-function Player:draw()
-    -- Active arc
+function Player:draw(cfg)
     local active = self.active
-    active:draw()
-    if self.alive then
-        active:drawEndDot()
+    if cfg.trails then
+        active:draw()
+        if self.alive then
+            active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
+        end
+        for i = 1, #self.trail do
+            self.trail[i]:draw()
+        end
     end
-    -- Trail
-    for i = 1, #self.trail do
-        self.trail[i]:draw()
+    if cfg.status then
+        self.status:draw(active:rads() + math.pi)
     end
-    -- Status
-    self.status:draw(self.active:rads() + math.pi)
 end
 
 function Player:won()
     self.status:addWin()
 end
 
+function Player:playing()
+    return self.toggle_time ~= nil
+end
+
 function Player:reset(arc)
     self.active = arc
-    self.playing = false
+    self.toggle_time = nil
     self.trail = {}
     self.alive = true
 end

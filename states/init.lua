@@ -4,6 +4,7 @@ local Gamestate = require 'hump.gamestate'
 
 local HC = require 'hc'
 local shapes = require 'hc.shapes'
+local shine = require 'shine'
 
 require 'arc'
 require 'control'
@@ -23,7 +24,8 @@ local init = {
     },
     map = nil,
     players = {},
-    states = {}
+    states = {},
+    shaders = {}
 }
 
 function init:init()
@@ -40,6 +42,13 @@ function init:init()
     local font_size = radius * 1.5
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
+
+    -- self.shaders.trail = shine.boxblur()
+    -- self.shaders.trail.radius = 4
+    self.shaders.trail = shine.gaussianblur()
+    self.shaders.trail.sigma = 6
+    self.shaders.cfg_all = { trails = true, status = true }
+    self.shaders.cfg_trails = { trails = true, status = false }
 end
 
 function init:enter()
@@ -62,10 +71,12 @@ function init:enter()
 
     local display_offset = radius * 2;
 
-    local arc = Arc:new({x = -radius, y = -radius, radius = radius, dot_radius = radius / 8})
+    local width = math.max(1, math.floor(radius / 32))
+    local arc = Arc:new({x = -radius, y = -radius, radius = radius, dot_radius = radius / 8, width = width})
 
     local map_radius = math.min(screen_x, screen_y) / 2.05 -- Fit onscreen
-    self.map = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = radius / 8})
+    local map_width = width * 1.5
+    self.map = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = arc.dot_radius * 1.5, width = map_width})
 
     -- TODO don't duplicate end_rads start position here.
     self.players[1] = Player:new({

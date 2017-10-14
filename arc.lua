@@ -6,6 +6,7 @@ Arc = {
     x = 0,
     y = 0,
     radius = 0,
+    width = 1,
     dot_radius = 0,
     start_rads = 0,
     end_rads = 0,
@@ -27,6 +28,7 @@ function Arc:changeDirection()
         x = self.x + dx,
         y = self.y + dy,
         radius = self.radius,
+        width = self.width,
         dot_radius = self.dot_radius,
         start_rads = start_rads,
         end_rads = start_rads,
@@ -112,12 +114,13 @@ function isBetween(start_rads, end_rads, query_rads)
     return query_rads <= end_rads
 end
 
-function Arc:draw()
+function Arc:draw(shader)
+    love.graphics.setLineWidth(self.width)
     love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
-function Arc:drawEndDot()
-    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius)
+function Arc:drawEndDot(size, shader)
+    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius * size)
 end
 
 function Arc:new(o)

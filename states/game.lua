@@ -14,6 +14,7 @@ local game = {}
 
 function game:enter(intermission)
     self.states = intermission.states
+    self.shaders = intermission.shaders
     self.env = intermission.env
     self.players = intermission.players
     self.map = intermission.map
@@ -59,7 +60,7 @@ function game:update(dt)
     if active <= 1 then
         local playing = 0
         for i = 1, #players do
-            if players[i].playing then
+            if players[i]:playing() then
                 playing = playing + 1
             end
             if players[i].alive then
@@ -75,8 +76,16 @@ function game:update(dt)
 end
 
 function game:draw()
+    -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    self.shaders.trail:draw(function()
+        self:_draw(self.shaders.cfg_trails)
+    end)
+    self:_draw(self.shaders.cfg_all)
+end
+
+function game:_draw(cfg)
     for i = 1, #self.players do
-       self.players[i]:draw()
+        self.players[i]:draw(cfg)
     end
     self.map:draw()
 end
@@ -91,7 +100,17 @@ function game:_resetPlayers()
     local function _resetActive(player, angle)
         local map_x, map_y = self.map.x, self.map.y
         local r = self.map.radius * 0.7
-        local arc = Arc:new({ x = map_x + math.cos(angle) * r, y = map_y + math.sin(angle) * r, radius = player.active.radius, dot_radius = player.active.dot_radius, start_rads = angle, end_rads = angle, direction = 'cw', player = player.active.player })
+        local arc = Arc:new({
+            x = map_x + math.cos(angle) * r,
+            y = map_y + math.sin(angle) * r,
+            radius = player.active.radius,
+            dot_radius = player.active.dot_radius,
+            width = player.active.width,
+            start_rads = angle,
+            end_rads = angle,
+            direction = 'cw',
+            player = player.active.player
+        })
         player:reset(arc)
         player:addToCollider(self.collider)
     end
