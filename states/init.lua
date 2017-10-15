@@ -45,8 +45,8 @@ function init:init()
 
     -- self.shaders.trail = shine.boxblur()
     -- self.shaders.trail.radius = 4
-    self.shaders.trail = shine.gaussianblur()
-    self.shaders.trail.sigma = 6
+    local blur = shine.gaussianblur({sigma = 4})
+    self.shaders.trail = blur
     self.shaders.cfg_all = { trails = true, status = true }
     self.shaders.cfg_trails = { trails = true, status = false }
 end

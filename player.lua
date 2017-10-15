@@ -71,12 +71,21 @@ function Player:draw(cfg)
         if self.alive then
             active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
         end
+    end
+    if cfg.status then
         for i = 1, #self.trail do
             self.trail[i]:draw()
         end
-    end
-    if cfg.status then
         self.status:draw(active:rads() + math.pi)
+    end
+end
+
+function Player:drawBloom()
+    for i = 1, #self.trail do
+        if not self.trail[i].isBloomed then
+            self.trail[i].isBloomed = true
+            self.trail[i]:draw()
+        end
     end
 end
 

@@ -24,7 +24,17 @@ function game:enter(intermission)
     self.collider = HC.new(100)
     self.map:addToCollider(self.collider)
 
+    self.canvas_bloom = love.graphics.newCanvas()
+
     self:_resetPlayers()
+
+    local canvas = love.graphics.getCanvas()
+    love.graphics.setCanvas(self.canvas_bloom)
+    self.shaders.trail:draw(function()
+        self.map:draw()
+        self:_drawBloom()
+    end)
+    love.graphics.setCanvas(canvas)
 end
 
 function game:leave()
@@ -77,17 +87,35 @@ end
 
 function game:draw()
     -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    local canvas = love.graphics.getCanvas()
+    love.graphics.setCanvas(self.canvas_bloom)
+    self.shaders.trail:draw(function()
+        self:_drawBloom()
+    end)
+    love.graphics.setCanvas(canvas)
+    local b = love.graphics.getBlendMode()
+    love.graphics.setBlendMode('alpha', 'premultiplied')
+    love.graphics.draw(self.canvas_bloom, 0, 0)
+    love.graphics.setBlendMode(b)
     self.shaders.trail:draw(function()
         self:_draw(self.shaders.cfg_trails)
     end)
     self:_draw(self.shaders.cfg_all)
 end
 
+function game:_drawBloom()
+    for i = 1, #self.players do
+        self.players[i]:drawBloom()
+    end
+end
+
 function game:_draw(cfg)
     for i = 1, #self.players do
         self.players[i]:draw(cfg)
     end
-    self.map:draw()
+    if cfg.status then
+        self.map:draw()
+    end
 end
 
 function game:focus(focus)
