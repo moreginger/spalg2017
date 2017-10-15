@@ -37,22 +37,12 @@ local function build_shader(sigma)
 		{
 		vec3 colOut = vec3( 0.0f );
 
-const int stepCount = 2;
-const float gWeights[stepCount] ={
-0.44908f,
-0.05092f
-};
-const float gOffsets[stepCount] ={
-0.53805f,
-2.06278f
-};
-
-for( int i = 0; i < stepCount; i++ )
-{
-	vec2 texCoordOffset = gOffsets[i] * direction;
+	vec2 texCoordOffset = 0.53805f * direction;
 	vec3 col = texture2D( tex0, tc + texCoordOffset ).xyz + texture2D( tex0, tc - texCoordOffset ).xyz;
-	colOut += gWeights[i] * col;
-}
+	colOut += 0.44908f * col;
+	texCoordOffset = 2.06278f * direction;
+	col = texture2D( tex0, tc + texCoordOffset ).xyz + texture2D( tex0, tc - texCoordOffset ).xyz;
+	colOut += 0.05092f * col;
 return vec4(colOut, 1.0f);
 }
 	]]}
