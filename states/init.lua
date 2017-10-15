@@ -4,7 +4,7 @@ local Gamestate = require 'hump.gamestate'
 
 local HC = require 'hc'
 local shapes = require 'hc.shapes'
-local shine = require 'shine'
+require 'bloom'
 
 require 'arc'
 require 'control'
@@ -45,8 +45,8 @@ function init:init()
 
     -- self.shaders.trail = shine.boxblur()
     -- self.shaders.trail.radius = 4
-    self.shaders.trail = shine.gaussianblur()
-    self.shaders.trail.sigma = 6
+    self.shaders.trail = CreateBloomEffect(1000, 1000)
+    -- self.shaders.trail.sigma = 6
     self.shaders.cfg_all = { trails = true, status = true }
     self.shaders.cfg_trails = { trails = true, status = false }
 end

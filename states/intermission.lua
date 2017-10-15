@@ -30,9 +30,6 @@ function intermission:update(dt)
 end
 
 function intermission:draw()
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
     self:_draw(self.shaders.cfg_all)
 end
 

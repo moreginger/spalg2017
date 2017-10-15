@@ -76,14 +76,20 @@ function game:update(dt)
 end
 
 function game:draw()
-    -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
+    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
     self:_draw(self.shaders.cfg_all)
 end
 
 function game:_draw(cfg)
+    self.shaders.trail:predraw()
+    self.shaders.trail:enabledrawtobloom()
+ 
+    -- Draw the things you want to be bloomed
+ 
+    for i = 1, #self.players do
+        self.players[i]:draw(cfg)
+    end
+    self.shaders.trail:postdraw()
     for i = 1, #self.players do
         self.players[i]:draw(cfg)
     end
