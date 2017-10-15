@@ -19,4 +19,12 @@ function pause:focus(f)
     end
 end
 
+function pause:keypressed(key, scan_code, is_repeat)
+    Gamestate.pop()
+end
+
+function pause:touchpressed(id, x, y, dx, dy, pressure)
+    Gamestate.pop()
+end
+
 return pause
