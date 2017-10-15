@@ -4,7 +4,6 @@ local Gamestate = require 'hump.gamestate'
 
 local HC = require 'hc'
 local shapes = require 'hc.shapes'
-local shine = require 'shine'
 
 require 'arc'
 require 'control'
@@ -24,8 +23,7 @@ local init = {
     },
     map = nil,
     players = {},
-    states = {},
-    shaders = {}
+    states = {}
 }
 
 function init:init()
@@ -42,13 +40,6 @@ function init:init()
     local font_size = radius * 1.5
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
-
-    -- self.shaders.trail = shine.boxblur()
-    -- self.shaders.trail.radius = 4
-    self.shaders.trail = shine.gaussianblur()
-    self.shaders.trail.sigma = 6
-    self.shaders.cfg_all = { trails = true, status = true }
-    self.shaders.cfg_trails = { trails = true, status = false }
 end
 
 function init:enter()

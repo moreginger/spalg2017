@@ -14,7 +14,6 @@ local game = {}
 
 function game:enter(intermission)
     self.states = intermission.states
-    self.shaders = intermission.shaders
     self.env = intermission.env
     self.players = intermission.players
     self.map = intermission.map
@@ -77,15 +76,8 @@ end
 
 function game:draw()
     -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
-    self:_draw(self.shaders.cfg_all)
-end
-
-function game:_draw(cfg)
     for i = 1, #self.players do
-        self.players[i]:draw(cfg)
+        self.players[i]:draw()
     end
     self.map:draw()
 end

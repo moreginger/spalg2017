@@ -64,20 +64,16 @@ function Player:addToCollider(collider)
     self.active:addToCollider(collider)
 end
 
-function Player:draw(cfg)
+function Player:draw()
     local active = self.active
-    if cfg.trails then
-        active:draw()
-        if self.alive then
-            active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
-        end
-        for i = 1, #self.trail do
-            self.trail[i]:draw()
-        end
+    active:draw()
+    if self.alive then
+        active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
     end
-    if cfg.status then
-        self.status:draw(active:rads() + math.pi)
+    for i = 1, #self.trail do
+        self.trail[i]:draw()
     end
+    self.status:draw(active:rads() + math.pi)
 end
 
 function Player:won()

@@ -7,7 +7,6 @@ local fin = {}
 
 function fin:enter(game)
     self.states = game.states
-    self.shaders = game.shaders
     self.env = game.env
     self.players = game.players
     self.map = game.map
@@ -31,15 +30,8 @@ function fin:update(dt)
 end
 
 function fin:draw()
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
-    self:_draw(self.shaders.cfg_all)
-end
-
-function fin:_draw(cfg)
     for i = 1, #self.players do
-       self.players[i]:draw(cfg)
+       self.players[i]:draw()
     end
     self.map:draw()
 end
