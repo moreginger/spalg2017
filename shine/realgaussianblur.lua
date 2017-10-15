@@ -23,29 +23,25 @@ SOFTWARE.
 ]]--
 
 -- unroll convolution loop
-local function build_shader(taps)
+local function build_shader(sigma)
+	local support = math.max(1, math.floor(3*sigma + .5))
+	local one_by_sigma_sq = sigma > 0 and 1 / (sigma * sigma) or 1
+	local norm = 0
+
 	local code = {[[
 		extern vec2 direction;
-		uniform sampler2D tex0;
-		vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
-		{
-		vec3 colOut = vec3( 0.0f );]]}
+		vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _)
+		{ vec4 c = vec4(0.0f);
+	]]}
+	local blur_line = "c += vec4(%f) * Texel(texture, tc + vec2(%f) * direction);"
 
-	local steps = (taps + 1) / 2
-
-	local one_by_sigma_sq = steps > 0 and 1 / (steps * steps) or 1
-	local norm = math.exp(0)
-
-	local tmpl = 'colOut += %f * ( texture2D( tex0, tc + %f * direction ).xyz + texture2D( tex0, tc - %f * direction ).xyz );'
-
-	code[#code+1] = ('colOut += %f * texture2D( tex0, tc).xyz;'):format(norm)
-	for i = 1, steps, 1 do
+	for i = -support,support do
 		local coeff = math.exp(-.5 * i*i * one_by_sigma_sq)
 		norm = norm + coeff
-		print(coeff)
-		code[#code+1] = tmpl:format(coeff, i, i)
+		code[#code+1] = blur_line:format(coeff, i)
 	end
-	code[#code+1] = ('return vec4(colOut, 1.0f) * vec4(%f);}'):format(0.5 / norm)
+
+	code[#code+1] = ("return c * vec4(%f) * color;}"):format(norm > 0 and 1/norm or 1)
 
 	return love.graphics.newShader(table.concat(code))
 end
@@ -75,7 +71,8 @@ draw = function(self, func, ...)
 
 	-- first pass (horizontal blur)
 	self.shader:send('direction', {1 / love.graphics.getWidth(), 0})
-	self:_render_to_canvas(self.canvas_v, love.graphics.draw, self.canvas_h, 0,0)
+	self:_render_to_canvas(self.canvas_v,
+	                       love.graphics.draw, self.canvas_h, 0,0)
 
 	-- second pass (vertical blur)
 	self.shader:send('direction', {0, 1 / love.graphics.getHeight()})
@@ -88,7 +85,7 @@ draw = function(self, func, ...)
 end,
 
 set = function(self, key, value)
-	if key == "taps" then
+	if key == "sigma" then
 		self.shader = build_shader(tonumber(value))
 	else
 		error("Unknown property: " .. tostring(key))
