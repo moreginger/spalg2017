@@ -10,6 +10,7 @@ local intermission = {
 -- other = init or game.
 function intermission:enter(other)
     self.states = other.states
+    self.shaders = other.shaders
     self.env = other.env
     self.map = other.map
     self.players = other.players
@@ -29,8 +30,17 @@ function intermission:update(dt)
 end
 
 function intermission:draw()
+    love.graphics.setLineWidth(1)
+    love.graphics.setColor(255, 255, 255, 255 )
+    self.shaders.trail:draw(function()
+        self:_draw(self.shaders.cfg_trails)
+    end)
+    self:_draw(self.shaders.cfg_all)
+end
+
+function intermission:_draw(cfg)
     for i = 1, #self.players do
-        self.players[i]:draw()
+        self.players[i]:draw(cfg)
     end
     self.map:draw()
     self.map:drawEndDot(1)

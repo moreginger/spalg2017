@@ -28,20 +28,34 @@ local function build_shader(sigma)
 	local one_by_sigma_sq = sigma > 0 and 1 / (sigma * sigma) or 1
 	local norm = 0
 
+
+
 	local code = {[[
 		extern vec2 direction;
-		vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _)
-		{ vec4 c = vec4(0.0f);
+		uniform sampler2D tex0;
+		vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
+		{
+		vec3 colOut = vec3( 0.0f );
+
+const int stepCount = 2;
+const float gWeights[stepCount] ={
+0.44908f,
+0.05092f
+};
+const float gOffsets[stepCount] ={
+0.53805f,
+2.06278f
+};
+
+for( int i = 0; i < stepCount; i++ )
+{
+	vec2 texCoordOffset = gOffsets[i] * direction;
+	vec3 col = texture2D( tex0, tc + texCoordOffset ).xyz + texture2D( tex0, tc - texCoordOffset ).xyz;
+	colOut += gWeights[i] * col;
+}
+return vec4(colOut, 1.0f);
+}
 	]]}
-	local blur_line = "c += vec4(%f) * Texel(texture, tc + vec2(%f) * direction);"
-
-	for i = -support,support do
-		local coeff = math.exp(-.5 * i*i * one_by_sigma_sq)
-		norm = norm + coeff
-		code[#code+1] = blur_line:format(coeff, i)
-	end
-
-	code[#code+1] = ("return c * vec4(%f) * color;}"):format(norm > 0 and 1/norm or 1)
 
 	return love.graphics.newShader(table.concat(code))
 end
