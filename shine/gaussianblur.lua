@@ -30,7 +30,8 @@ local function build_shader(taps)
 	end
 
 	-- Sigma is smaller than taps.
-	local sigma = taps / 3
+	local sigma = (taps - 1) / 6
+	print('sigma', sigma)
 	local steps = (taps + 1) / 2
 
 	local g_offsets = {}
@@ -42,6 +43,7 @@ local function build_shader(taps)
 		-- We don't need to include the fixed function as we normalize later anyway.
 		-- g_weights[i] = 1 / math.sqrt(2 * sigma ^ math.pi) * math.exp(-0.5 * ((offset - 0) / sigma) ^ 2 )
 		g_weights[i] = math.exp(-0.5 * (offset - 0) ^ 2 * 1 / sigma ^ 2 )
+		print('weight', i, g_weights[i])
 	end
 
 	local offsets = {}
@@ -49,8 +51,7 @@ local function build_shader(taps)
 	for i = #g_weights, 2, -2 do
 		local oA, oB = g_offsets[i], g_offsets[i - 1]
 		local wA, wB = g_weights[i], g_weights[i - 1]
-		local weight = wA + wB
-		print(oA, oB, wA, wB, (wA-wB))
+		local weight = i ~= 2 and wA + wB or wA + wB / 2 -- On final tap the middle is getting sampled twice so half weight.
 		offsets[#offsets + 1] = (oA * wA + oB * wB) / weight
 		weights[#weights + 1] = weight
 	end
@@ -63,10 +64,10 @@ extern vec2 direction;
 uniform sampler2D tex0;
 vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
 {
-    vec3 colOut = vec3( 0.0f );
+    vec4 colOut = vec4( 0.0f );
 ]]}
 
-	local tmpl = '    colOut += %f * ( texture2D( tex0, tc + %f * direction ).xyz + texture2D( tex0, tc - %f * direction ).xyz );\n'
+	local tmpl = '    colOut += %f * ( texture2D( tex0, tc + %f * direction ).xyzw + texture2D( tex0, tc - %f * direction ).xyzw );\n'
 
 	local norm = 0
 	for i = 1, #offsets, 1 do
@@ -76,21 +77,11 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
 		code[#code+1] = tmpl:format(weight, offset, offset)
 	end
 	if #g_weights % 2 == 1 then
-		print('case 1')
 		local weight = g_weights[1]
 		norm = norm + weight
-		code[#code+1] = ('    colOut += %f * texture2D( tex0, tc).xyz;'):format(weight)
-	else
-		-- TODO avoid duplicating code
-		print('case 2')
-		local oA, oB = g_offsets[2], g_offsets[1];
-		local wA, wB = g_weights[2], g_weights[1]
-		local weight = wA + wB
-		norm = norm + weight * 2
-		local offset = (oA * wA + oB * wB) / (wA + wB)
-		code[#code+1] = tmpl:format(weight, offset, offset)
+		code[#code+1] = ('    colOut += %f * texture2D( tex0, tc).xyzw;'):format(weight)
 	end
-	code[#code+1] = ('    return vec4(colOut, 1.0f) * vec4(%f);}'):format(1 / norm)
+	code[#code+1] = ('    return colOut * vec4(%f);}'):format(1 / norm)
 
 	local shader = table.concat(code)
 	print(shader)

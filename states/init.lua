@@ -44,8 +44,8 @@ function init:init()
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
     -- self.shaders.trail = shine.boxblur({ radius = 3 })
-    self.shaders.trail = shine.gaussianblur({ taps = 9 })
-    -- self.shaders.trail = shine.realgaussianblur({ sigma = 11 })
+    self.shaders.trail = shine.gaussianblur({ taps = 19 })
+    self.shaders.trail2 = shine.realgaussianblur({ sigma = 3 })
     self.shaders.cfg_all = { trails = true, status = true }
     self.shaders.cfg_trails = { trails = true, status = false }
 end
