@@ -23,28 +23,36 @@ SOFTWARE.
 ]]--
 
 -- unroll convolution loop
-local function build_shader(sigma)
-	local sigma = math.floor(sigma)
-	if sigma < 1 or sigma % 2 ~= 1 then
-	    error(('Sigma must be >0 and odd. Was %d.'):format(sigma))
+local function build_shader(taps)
+	local taps = math.floor(taps)
+	if taps < 1 or taps % 2 ~= 1 then
+	    error(('Taps must be >0 and odd. Was %d.'):format(taps))
 	end
-	local steps = (math.floor(sigma) + 1) / 2
 
-	local g_offset = {}
-	local g_weight = {}
+	-- Sigma is smaller than taps.
+	local sigma = taps / 3
+	local steps = (taps + 1) / 2
+
+	local g_offsets = {}
+	local g_weights = {}
 	for i = 1, steps, 1 do
-		g_offset[i] = i - 1
-		-- TODO gaussian function
-		g_weight[i] = 1 / ( i * i )
+		local offset = i - 1
+		g_offsets[i] = offset
+
+		-- We don't need to include the fixed function as we normalize later anyway.
+		-- g_weights[i] = 1 / math.sqrt(2 * sigma ^ math.pi) * math.exp(-0.5 * ((offset - 0) / sigma) ^ 2 )
+		g_weights[i] = math.exp(-0.5 * (offset - 0) ^ 2 * 1 / sigma ^ 2 )
 	end
 
-	local offset = {}
-	local weight = {}
-	for i = #g_weight, 2, -2 do
-		local oA, oB = g_offset[i], g_offset[i - 1]
-		local wA, wB = g_weight[i], g_weight[i - 1]
-		offset[#offset + 1] = (oA * wA + oB * wB) / (wA + wB)
-		weight[#weight + 1] = wA + wB
+	local offsets = {}
+	local weights = {}
+	for i = #g_weights, 2, -2 do
+		local oA, oB = g_offsets[i], g_offsets[i - 1]
+		local wA, wB = g_weights[i], g_weights[i - 1]
+		local weight = wA + wB
+		print(oA, oB, wA, wB, (wA-wB))
+		offsets[#offsets + 1] = (oA * wA + oB * wB) / weight
+		weights[#weights + 1] = weight
 	end
 
 	-- TODO centre
@@ -61,23 +69,22 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
 	local tmpl = '    colOut += %f * ( texture2D( tex0, tc + %f * direction ).xyz + texture2D( tex0, tc - %f * direction ).xyz );\n'
 
 	local norm = 0
-	for i = 1, #offset, 1 do
-		local offset = offset[i]
-		local weight = weight[i]
+	for i = 1, #offsets, 1 do
+		local offset = offsets[i]
+		local weight = weights[i]
 		norm = norm + weight * 2
 		code[#code+1] = tmpl:format(weight, offset, offset)
 	end
-	print(#g_weight)
-	if #g_weight % 2 == 0 then
+	if #g_weights % 2 == 1 then
 		print('case 1')
-		local weight = g_weight[1]
+		local weight = g_weights[1]
 		norm = norm + weight
 		code[#code+1] = ('    colOut += %f * texture2D( tex0, tc).xyz;'):format(weight)
 	else
 		-- TODO avoid duplicating code
 		print('case 2')
-		local oA, oB = g_offset[2], g_offset[1];
-		local wA, wB = g_weight[2], g_weight[1]
+		local oA, oB = g_offsets[2], g_offsets[1];
+		local wA, wB = g_weights[2], g_weights[1]
 		local weight = wA + wB
 		norm = norm + weight * 2
 		local offset = (oA * wA + oB * wB) / (wA + wB)
@@ -128,7 +135,7 @@ draw = function(self, func, ...)
 end,
 
 set = function(self, key, value)
-	if key == "sigma" then
+	if key == "taps" then
 		self.shader = build_shader(tonumber(value))
 	else
 		error("Unknown property: " .. tostring(key))
