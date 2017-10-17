@@ -51,13 +51,11 @@ local function build_shader(taps)
 	for i = #g_weights, 2, -2 do
 		local oA, oB = g_offsets[i], g_offsets[i - 1]
 		local wA, wB = g_weights[i], g_weights[i - 1]
-		local weight = i ~= 2 and wA + wB or wA + wB / 2 -- On final tap the middle is getting sampled twice so half weight.
+		wB = i ~=2 and wB or wB / 2 -- On final tap the middle is getting sampled twice so half weight.
+		local weight = wA + wB
 		offsets[#offsets + 1] = (oA * wA + oB * wB) / weight
 		weights[#weights + 1] = weight
 	end
-
-	-- TODO centre
-
 
 	local code = {[[
 extern vec2 direction;
