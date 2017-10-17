@@ -1,7 +1,7 @@
 --[[
 The MIT License (MIT)
 
-Copyright (c) 2015 Matthias Richter
+Copyright (c) 2017 Tim Moore
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]--
+
+-- Bilinear Gaussian blur filter as detailed here: http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+-- Produces near identical results to a standard Gaussian blur by using sub-pixel sampling,
+-- this allows us to do ~1/2 the number of pixel lookups.
 
 -- unroll convolution loop
 local function build_shader(taps, offset, sigma)
@@ -45,7 +49,7 @@ local function build_shader(taps, offset, sigma)
 		g_weights[i] = math.exp(-0.5 * (offset - 0) ^ 2 * 1 / sigma ^ 2 )
 	end
 
-	-- Calculate offsets and weights for subsamples.
+	-- Calculate offsets and weights for sub-pixel samples.
 	local offsets = {}
 	local weights = {}
 	for i = #g_weights, 2, -2 do
@@ -78,7 +82,7 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc) {]]}
 		norm = norm + weight * 2
 		code[#code+1] = tmpl:format(weight, offset, offset)
 	end
-	code[#code+1] = ('return c * vec4(%f); }'):format(1 / norm)
+	code[#code+1] = ('return c * vec4(%f) * color; }'):format(1 / norm)
 
 	local shader = table.concat(code)
 	return love.graphics.newShader(shader)
@@ -126,13 +130,13 @@ end,
 
 set = function(self, key, value)
 	if key == "taps" then
-		-- Number of effective samples to take. e.g. 3-tap is the current pixel and the neighbors each side.
+		-- Number of effective samples to take per pass. e.g. 3-tap is the current pixel and the neighbors each side.
 		-- More taps = larger blur, but slower.
 		self.taps = tonumber(value)
 	elseif key == "offset" then
-		-- Offset of tap. It's usually best to keep the default of 1.
-		-- For highest quality this should be <=1 but in some cases we can approximate the blur
-		-- with a larger offset and less taps (i.e. faster).
+		-- Offset of each tap.
+		-- For highest quality this should be <=1 but if the image has low entropy we
+		-- can approximate the blur with a number > 1 and less taps, for better performance.
 		self.offset = tonumber(value)
 	elseif key == "sigma" then
 		-- Sigma value for gaussian distribution. You don't normally need to set this.
