@@ -52,7 +52,7 @@ function game:update(dt)
     self.time = self.time + dt
 
     local players = self.players
-    local dr = dt * 0.2
+    local dr = dt * self.env.dt_speedup
     local active = 0
     for i = 1, #players do
         if players[i].alive then
@@ -80,21 +80,10 @@ function game:update(dt)
 end
 
 function game:draw()
-    for i = 1, 1, 1 do
-        if math.floor(self.time) % 6 < 3 then
-            love.graphics.print("fast", 10, 200)
-            self.shaders.trail:draw(function()
-                self:_draw(self.shaders.cfg_trails)
-            end)
-        else
-            love.graphics.print("slow", 10, 200)
-            self.shaders.trail2:draw(function()
-                self:_draw(self.shaders.cfg_trails)
-            end)
-        end
-    end
-    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-    -- self:_draw(self.shaders.cfg_all)
+    self.shaders.trail:draw(function()
+        self:_draw(self.shaders.cfg_trails)
+    end)
+    self:_draw(self.shaders.cfg_all)
 end
 
 function game:_draw(cfg)
