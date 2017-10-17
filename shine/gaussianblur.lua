@@ -23,29 +23,29 @@ SOFTWARE.
 ]]--
 
 -- unroll convolution loop
-local function build_shader(taps)
-	local taps = math.floor(taps)
-	if taps < 1 or taps % 2 ~= 1 then
-	    error(('Taps must be >0 and odd. Was %d.'):format(taps))
+local function build_shader(taps, offset, sigma)
+	taps = math.floor(taps)
+	sigma = sigma >= 1 and sigma or (taps - 1) * offset / 6
+
+	if taps < 3 or taps % 2 ~= 1 then
+	    error(('Taps must be >=3 and odd. Was %d.'):format(taps))
 	end
 
-	-- Sigma is smaller than taps.
-	local sigma = (taps - 1) / 6
-	print('sigma', sigma)
 	local steps = (taps + 1) / 2
 
+	-- Calculate gaussian function.
 	local g_offsets = {}
 	local g_weights = {}
 	for i = 1, steps, 1 do
 		local offset = i - 1
 		g_offsets[i] = offset
 
-		-- We don't need to include the fixed function as we normalize later anyway.
-		-- g_weights[i] = 1 / math.sqrt(2 * sigma ^ math.pi) * math.exp(-0.5 * ((offset - 0) / sigma) ^ 2 )
+		-- We don't need to include the constant part of the gaussian function as we normalize later.
+		-- 1 / math.sqrt(2 * sigma ^ math.pi) * math.exp(-0.5 * ((offset - 0) / sigma) ^ 2 )
 		g_weights[i] = math.exp(-0.5 * (offset - 0) ^ 2 * 1 / sigma ^ 2 )
-		print('weight', i, g_weights[i])
 	end
 
+	-- Calculate offsets and weights for subsamples.
 	local offsets = {}
 	local weights = {}
 	for i = #g_weights, 2, -2 do
@@ -60,39 +60,40 @@ local function build_shader(taps)
 	local code = {[[
 extern vec2 direction;
 uniform sampler2D tex0;
-vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc)
-{
-    vec4 colOut = vec4( 0.0f );
-]]}
+vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc) {]]}
 
-	local tmpl = '    colOut += %f * ( texture2D( tex0, tc + %f * direction ).xyzw + texture2D( tex0, tc - %f * direction ).xyzw );\n'
+    local norm = 0
+	if #g_weights % 2 == 0 then
+		code[#code+1] =  'vec4 c = vec4( 0.0f );'
+	else
+		local weight = g_weights[1]
+		norm = norm + weight
+		code[#code+1] = ('vec4 c = %f * texture2D( tex0, tc ).xyzw;'):format(weight)
+	end
 
-	local norm = 0
+	local tmpl = 'c += %f * ( texture2D( tex0, tc + %f * direction ).xyzw + texture2D( tex0, tc - %f * direction ).xyzw );\n'
 	for i = 1, #offsets, 1 do
 		local offset = offsets[i]
 		local weight = weights[i]
 		norm = norm + weight * 2
 		code[#code+1] = tmpl:format(weight, offset, offset)
 	end
-	if #g_weights % 2 == 1 then
-		local weight = g_weights[1]
-		norm = norm + weight
-		code[#code+1] = ('    colOut += %f * texture2D( tex0, tc).xyzw;'):format(weight)
-	end
-	code[#code+1] = ('    return colOut * vec4(%f);}'):format(1 / norm)
+	code[#code+1] = ('return c * vec4(%f); }'):format(1 / norm)
 
 	local shader = table.concat(code)
-	print(shader)
 	return love.graphics.newShader(shader)
 end
 
 return {
-description = "Fast Gaussian blur shader",
+
+description = "Bilinear Gaussian blur shader (http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/)",
 
 new = function(self)
 	self.canvas_h, self.canvas_v = love.graphics.newCanvas(), love.graphics.newCanvas()
-	self.shader = build_shader(7)
-	self.shader:send("direction",{1.0,0.0})
+	self.taps, self.offset, self.sigma = 7, 1, -1
+	self.shader = build_shader(self.taps, self.offset, self.sigma)
+
+	self.shader:send("direction", {1.0, 0.0} )
 end,
 
 draw = function(self, func, ...)
@@ -125,10 +126,22 @@ end,
 
 set = function(self, key, value)
 	if key == "taps" then
-		self.shader = build_shader(tonumber(value))
+		-- Number of effective samples to take. e.g. 3-tap is the current pixel and the neighbors each side.
+		-- More taps = larger blur, but slower.
+		self.taps = tonumber(value)
+	elseif key == "offset" then
+		-- Offset of tap. It's usually best to keep the default of 1.
+		-- For highest quality this should be <=1 but in some cases we can approximate the blur
+		-- with a larger offset and less taps (i.e. faster).
+		self.offset = tonumber(value)
+	elseif key == "sigma" then
+		-- Sigma value for gaussian distribution. You don't normally need to set this.
+	    self.sigma = tonumber(value)
 	else
 		error("Unknown property: " .. tostring(key))
 	end
+
+	self.shader = build_shader(self.taps, self.offset, self.sigma)
 	return self
 end
 }
