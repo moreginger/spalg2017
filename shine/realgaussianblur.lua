@@ -37,7 +37,6 @@ local function build_shader(sigma)
 
 	for i = -support,support do
 		local coeff = math.exp(-.5 * i*i * one_by_sigma_sq)
-		print('coeff', i, coeff)
 		norm = norm + coeff
 		code[#code+1] = blur_line:format(coeff, i)
 	end
