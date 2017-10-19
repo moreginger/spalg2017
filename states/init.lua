@@ -38,20 +38,17 @@ function init:init()
 
     local screen_x, screen_y, flags = love.window.getMode()
     local radius = math.min(screen_x, screen_y) / 16
+    local width = math.max(1, math.floor(radius / 32))
 
     local font_size = radius * 1.5
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
-
     -- TODO setup screen params here. Need to adj lines differently.
-    self.shaders.trail = shine.bilineargaussianblur({ taps = 15, offset = 1}):chain(shine.colorgrade({ grade = {0.6, 0.6, 0.6} }))
-    -- self.shaders.trail = shine.gaussianblur({ sigma = 5 }):chain(shine.colorgrade({ grade = {3, 3, 3} }))
-    --:chain(shine.colorgrade({ grade = {3, 3, 3} }))
+    self.shaders.trail = shine.bilineargaussianblur({ taps = 9, offset = width})
     --:chain(shine.colorgrade({ grade = {0.6, 0.6, 0.6} }))
     self.shaders.cfg_all = { trails = true, line_width_adj = 0, status = true }
     self.shaders.cfg_trails = { trails = true, line_width_adj = 0, status = false }
-    self.shaders.cfg_trails_blur = { trails = true, line_width_adj = 2, status = false }
 end
 
 function init:enter()

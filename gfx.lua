@@ -1,7 +1,5 @@
 function drawGame(players, map, draw_map_end, shaders)
     shaders.trail:draw(function()
-        love.graphics.setColor(48, 48, 48, 255)
-        _drawGameInternal(players, map, draw_map_end, shaders.cfg_trails_blur)
         love.graphics.setColor(255, 255, 255, 255)
         _drawGameInternal(players, map, draw_map_end, shaders.cfg_all)
     end)
