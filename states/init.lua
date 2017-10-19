@@ -43,10 +43,15 @@ function init:init()
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
-    self.shaders.trail = shine.bilineargaussianblur({ taps = 9, offset = 2 }):chain(shine.colorgrade({ grade = {1.5, 1.5, 2} }))
-    self.shaders.trail2 = shine.bilineargaussianblur({ taps = 17, offset = 1 }):chain(shine.colorgrade({ grade = {1.5, 1.5, 2} }))
-    self.shaders.cfg_all = { trails = true, status = true }
-    self.shaders.cfg_trails = { trails = true, status = false }
+
+    -- TODO setup screen params here. Need to adj lines differently.
+    self.shaders.trail = shine.bilineargaussianblur({ taps = 15, offset = 1}):chain(shine.colorgrade({ grade = {0.6, 0.6, 0.6} }))
+    -- self.shaders.trail = shine.gaussianblur({ sigma = 5 }):chain(shine.colorgrade({ grade = {3, 3, 3} }))
+    --:chain(shine.colorgrade({ grade = {3, 3, 3} }))
+    --:chain(shine.colorgrade({ grade = {0.6, 0.6, 0.6} }))
+    self.shaders.cfg_all = { trails = true, line_width_adj = 0, status = true }
+    self.shaders.cfg_trails = { trails = true, line_width_adj = 0, status = false }
+    self.shaders.cfg_trails_blur = { trails = true, line_width_adj = 2, status = false }
 end
 
 function init:enter()
@@ -73,7 +78,7 @@ function init:enter()
     local arc = Arc:new({x = -radius, y = -radius, radius = radius, dot_radius = radius / 8, width = width})
 
     local map_radius = math.min(screen_x, screen_y) / 2.05 -- Fit onscreen
-    local map_width = width * 1.5
+    local map_width = width -- At the moment I don't like it wider :)
     self.map = Arc:new({x = map_x, y = map_y, radius = map_radius, dot_radius = arc.dot_radius * 1.5, width = map_width})
 
     -- TODO don't duplicate end_rads start position here.

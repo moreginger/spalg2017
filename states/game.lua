@@ -6,6 +6,7 @@ local HC = require 'hc'
 
 require 'arc'
 require 'control'
+require 'gfx'
 require 'player'
 require 'status'
 
@@ -80,17 +81,7 @@ function game:update(dt)
 end
 
 function game:draw()
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
-    self:_draw(self.shaders.cfg_all)
-end
-
-function game:_draw(cfg)
-    for i = 1, #self.players do
-        self.players[i]:draw(cfg)
-    end
-    self.map:draw()
+    drawGame(self.players, self.map, false, self.shaders)
 end
 
 function game:focus(focus)

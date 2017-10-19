@@ -2,6 +2,8 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
+require 'gfx'
+
 -- Post game state.
 local fin = {}
 
@@ -31,17 +33,7 @@ function fin:update(dt)
 end
 
 function fin:draw()
-    self.shaders.trail:draw(function()
-        self:_draw(self.shaders.cfg_trails)
-    end)
-    self:_draw(self.shaders.cfg_all)
-end
-
-function fin:_draw(cfg)
-    for i = 1, #self.players do
-       self.players[i]:draw(cfg)
-    end
-    self.map:draw()
+    drawGame(self.players, self.map, false, self.shaders)
 end
 
 function fin:focus(focus)
