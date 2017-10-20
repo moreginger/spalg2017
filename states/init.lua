@@ -10,6 +10,7 @@ require 'arc'
 require 'control'
 require 'player'
 require 'status'
+require 'gfx'
 
 local intermission = require 'states.intermission'
 local game = require 'states.game'
@@ -54,6 +55,7 @@ end
 function init:enter()
     self.env.dt_speedup = 1
     self.env.round = 0
+    self.env.winner = 0
 
     -- TODO don't duplicate code with init.
     local screen_x, screen_y, flags = love.window.getMode()
@@ -99,8 +101,24 @@ function init:enter()
         status = self.status_tmpl:new({ display_x = display_offset, display_y = screen_y - display_offset }),
         active = arc:new({player = 4, end_rads = math.pi * 3 / 4})
     })
+end
 
-    Gamestate.switch(self.states.intermission)
+function init:update(dt)
+    local dr = dt * self.env.dt_speedup
+    self.map:update(4 * dr)
+    if self.map:intersectsSelf() then
+        Gamestate.switch(self.states.game)
+    end
+end
+
+function init:draw()
+    drawGame(self.players, self.map, true, self.shaders)
+end
+
+function init:focus(focus)
+    if not focus then
+        Gamestate.push(self.states.pause)
+    end
 end
 
 return init

@@ -13,14 +13,13 @@ require 'status'
 -- Main game state.
 local game = {}
 
-function game:enter(intermission)
-    self.states = intermission.states
-    self.shaders = intermission.shaders
-    self.env = intermission.env
-    self.players = intermission.players
-    self.map = intermission.map
-
-    self.state_intermission = intermission
+-- other: init / intermission
+function game:enter(other)
+    self.states = other.states
+    self.shaders = other.shaders
+    self.env = other.env
+    self.players = other.players
+    self.map = other.map
 
     self.collider = HC.new(100)
     self.map:addToCollider(self.collider)
@@ -62,21 +61,9 @@ function game:update(dt)
             players[i]:detectCollision(self.collider, dr)
         end
     end
+
     if active <= 1 then
-        local playing = 0
-        for i = 1, #players do
-            if players[i]:playing() then
-                playing = playing + 1
-            end
-            if players[i].alive then
-                players[i]:won()
-            end
-        end
-        if playing == 0 then
-            Gamestate.switch(self.states.fin)
-        else
-            Gamestate.switch(self.state_intermission)
-        end
+        Gamestate.switch(self.states.intermission)
     end
 end
 

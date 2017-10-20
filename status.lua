@@ -9,7 +9,8 @@ Status = {
 
 function Status:draw(angle)
     love.graphics.setFont(self.font)
-    love.graphics.printf(math.floor(self.wins), self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
+    local wins = math.ceil(self.wins)
+    love.graphics.printf(wins, self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
 end
 
 function Status:addWin()

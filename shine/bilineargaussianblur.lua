@@ -85,7 +85,7 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc) {]]}
 	code[#code+1] = ('return %f * vec4(c, 1.0f) * color; }'):format(1 / norm)
 
 	local shader = table.concat(code)
-	print(shader)
+	-- print(shader)
 	return love.graphics.newShader(shader)
 end
 

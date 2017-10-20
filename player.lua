@@ -82,6 +82,7 @@ end
 
 function Player:won()
     self.status:addWin()
+    return self.status.wins
 end
 
 function Player:playing()
