@@ -12,7 +12,8 @@ Arc = {
     end_rads = 0,
     total_rads = 0,
     direction = 'cw',
-    player = 0
+    player = 0,
+    co = nil
 }
 
 function Arc:update(dr)

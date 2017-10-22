@@ -43,8 +43,12 @@ end
 
 function game:touchpressed(id, x, y, dx, dy, pressure)
     local players = self.players
-    for i = 1, #players do
-       players[i]:touchpressed(x, y, self.collider)
+    if self.map.co:contains(x, y) then
+        -- Mask play area to help discourage attempts to interact with it.
+    else
+        for i = 1, #players do
+           players[i]:touchpressed(x, y, self.collider)
+        end
     end
 end
 
