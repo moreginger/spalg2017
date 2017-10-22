@@ -67,12 +67,12 @@ end
 function Player:draw(cfg)
     local active = self.active
     if cfg.trails then
-        active:draw(cfg.line_width_adj)
+        active:draw()
         if self.alive then
             active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
         end
         for i = 1, #self.trail do
-            self.trail[i]:draw(cfg.line_width_adj)
+            self.trail[i]:draw()
         end
     end
     if cfg.status then

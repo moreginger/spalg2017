@@ -11,7 +11,7 @@ function _drawGameInternal(players, map, draw_map_end, cfg)
     for i = 1, #players do
         players[i]:draw(cfg)
     end
-    map:draw(cfg.line_width_adj)
+    map:draw()
     if draw_map_end then
         map:drawEndDot(1)
     end
