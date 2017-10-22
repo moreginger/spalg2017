@@ -34,7 +34,6 @@ function intermission:enter(other)
             end
         end
     end
-    print(playing, self.env.winner)
     if playing == 0 or self.env.winner > 0 then
         Gamestate.switch(self.states.fin)
     else
