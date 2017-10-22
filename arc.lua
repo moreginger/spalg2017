@@ -114,13 +114,14 @@ function isBetween(start_rads, end_rads, query_rads)
     return query_rads <= end_rads
 end
 
-function Arc:draw(shader)
-    love.graphics.setLineWidth(self.width)
+function Arc:draw(line_width_adj)
+    love.graphics.setLineWidth(self.width + line_width_adj)
     love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
-function Arc:drawEndDot(size, shader)
+function Arc:drawEndDot(size)
     love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius * size)
+    love.graphics.circle('line', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius * size)
 end
 
 function Arc:new(o)

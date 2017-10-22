@@ -2,11 +2,14 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
+require 'gfx'
+
 -- Post game state.
 local fin = {}
 
 function fin:enter(game)
     self.states = game.states
+    self.shaders = game.shaders
     self.env = game.env
     self.players = game.players
     self.map = game.map
@@ -30,10 +33,7 @@ function fin:update(dt)
 end
 
 function fin:draw()
-    for i = 1, #self.players do
-       self.players[i]:draw()
-    end
-    self.map:draw()
+    drawGame(self.players, self.map, false, self.shaders)
 end
 
 function fin:focus(focus)

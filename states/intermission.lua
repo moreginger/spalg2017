@@ -2,6 +2,8 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
+require 'gfx'
+
 -- Short intermission between rounds
 local intermission = {
     name = 'intermission'
@@ -10,6 +12,7 @@ local intermission = {
 -- other = init or game.
 function intermission:enter(other)
     self.states = other.states
+    self.shaders = other.shaders
     self.env = other.env
     self.map = other.map
     self.players = other.players
@@ -29,11 +32,7 @@ function intermission:update(dt)
 end
 
 function intermission:draw()
-    for i = 1, #self.players do
-        self.players[i]:draw()
-    end
-    self.map:draw()
-    self.map:drawEndDot(1)
+    drawGame(self.players, self.map, true, self.shaders)
 end
 
 function intermission:focus(focus)

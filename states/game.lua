@@ -6,6 +6,7 @@ local HC = require 'hc'
 
 require 'arc'
 require 'control'
+require 'gfx'
 require 'player'
 require 'status'
 
@@ -14,6 +15,7 @@ local game = {}
 
 function game:enter(intermission)
     self.states = intermission.states
+    self.shaders = intermission.shaders
     self.env = intermission.env
     self.players = intermission.players
     self.map = intermission.map
@@ -24,6 +26,8 @@ function game:enter(intermission)
     self.map:addToCollider(self.collider)
 
     self:_resetPlayers()
+
+    self.time = 0
 end
 
 function game:leave()
@@ -46,6 +50,8 @@ function game:touchpressed(id, x, y, dx, dy, pressure)
 end
 
 function game:update(dt)
+    self.time = self.time + dt
+
     local players = self.players
     local dr = dt * self.env.dt_speedup
     local active = 0
@@ -75,11 +81,7 @@ function game:update(dt)
 end
 
 function game:draw()
-    -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-    for i = 1, #self.players do
-        self.players[i]:draw()
-    end
-    self.map:draw()
+    drawGame(self.players, self.map, false, self.shaders)
 end
 
 function game:focus(focus)

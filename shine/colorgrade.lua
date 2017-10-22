@@ -23,22 +23,18 @@ SOFTWARE.
 ]]--
 
 return {
-description = "Desaturation/tint effect",
+description = "Simple linear color grading of red, green and blue channel",
 
 new = function(self)
 	self.canvas = love.graphics.newCanvas()
 	self.shader = love.graphics.newShader[[
-		extern vec4 tint;
-		extern number strength;
+		extern vec3 grade;
 		vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _)
 		{
-			color = Texel(texture, tc);
-			number luma = dot(vec3(0.299f, 0.587f, 0.114f), color.rgb);
-			return mix(color, tint * luma, strength);
+			return vec4(grade, 1.0f) * Texel(texture, tc) * color;
 		}
 	]]
-	self.shader:send("tint",{1.0,1.0,1.0,1.0})
-	self.shader:send("strength",0.5)
+	self.shader:send("grade",{1.0,1.0,1.0})
 end,
 
 draw = function(self, func, ...)
@@ -46,11 +42,8 @@ draw = function(self, func, ...)
 end,
 
 set = function(self, key, value)
-	if key == "tint" then
-		assert(type(value) == "table")
-		self.shader:send("tint", {value[1]/255, value[2]/255, value[3]/255, 1})
-	elseif key == "strength" then
-		self.shader:send("strength", math.max(0, math.min(1, tonumber(value) or 0)))
+	if key == "grade" then
+		self.shader:send(key, value)
 	else
 		error("Unknown property: " .. tostring(key))
 	end
@@ -58,3 +51,4 @@ set = function(self, key, value)
 	return self
 end
 }
+
