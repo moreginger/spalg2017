@@ -4,12 +4,13 @@ Status = {
 
     display_x = 0,
     display_y = 0,
+    angle = 0,
     step = 0
 }
 
-function Status:draw(angle, total_rads)
+function Status:draw(total_rads)
     love.graphics.translate(self.display_x, self.display_y)
-    love.graphics.rotate(angle)
+    love.graphics.rotate(self.angle)
     local alpha = self.playing and 255 or 128 + math.sin(total_rads * 2) * 64
     love.graphics.setColor(150, 150, 150, alpha)
     local length = 2.3

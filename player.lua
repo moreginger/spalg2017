@@ -1,6 +1,7 @@
 require 'arc'
 
 Player = {
+    start_rads = 0,
     active = nil,
     toggle_time = nil, -- Time since last direction change, or nil if none.
     trail = {},
@@ -11,8 +12,9 @@ Player = {
 
 function Player:update(dr)
     self.active:update(dr)
+    self.status.angle = self.active.end_rads
     if self.toggle_time ~= nil then
-        self.toggle_time = self.toggle_time + dr * 4
+        self.toggle_time = self.toggle_time + dr
     end
 end
 
@@ -70,14 +72,14 @@ function Player:draw(cfg)
     if cfg.trails then
         active:draw()
         if self.alive then
-            active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time) or 1))
+            active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time * 4) or 1))
         end
         for i = 1, #self.trail do
             self.trail[i]:draw()
         end
     end
     if cfg.status then
-        self.status:draw(active:rads() + math.pi, active.total_rads)
+        self.status:draw(active.total_rads)
     end
 end
 

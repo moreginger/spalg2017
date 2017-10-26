@@ -86,27 +86,28 @@ function init:enter()
     self.map = Arc:new({x = env.screen_x / 2, y = env.screen_y / 2, radius = map_radius, dot_radius = dot_radius * 1.5, width = env.trail_width})
 
     local display_offset = trail_radius * 2;
-    -- TODO don't duplicate end_rads start position here.
     self.players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = self.status_tmpl:new({ display_x = display_offset, display_y = display_offset }),
-        active = arc:new({player = 1, end_rads = math.pi * 5 / 4})
+        status = self.status_tmpl:new({ display_x = display_offset, display_y = display_offset })
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = display_offset, wins = 15 }),
-        active = arc:new({player = 2, end_rads = math.pi * 7 / 4})
+        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = display_offset, wins = 15 })
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = env.screen_y - display_offset }),
-        active = arc:new({player = 3, end_rads = math.pi * 1 / 4})
+        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = env.screen_y - display_offset })
     })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_x = display_offset, display_y = env.screen_y - display_offset }),
-        active = arc:new({player = 4, end_rads = math.pi * 3 / 4})
+        status = self.status_tmpl:new({ display_x = display_offset, display_y = env.screen_y - display_offset })
     })
+    for i = 1, #self.players, 1 do
+        local p = self.players[i]
+        local start_rads = (3 + i * 2) % 8 / 4 * math.pi
+        p.start_rads = start_rads
+        p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
+    end
 end
 
 function init:update(dt)
