@@ -22,7 +22,7 @@ function Status:draw(angle, total_rads)
     local wins = math.ceil(self.wins)
 
     love.graphics.setColor(255, 255, 255, alpha)
-    local r = math.floor(step / 3)
+    local r = math.floor(step / 4)
     for i = 1, wins, 1 do
         local x = (i - 1) % 5 - 2
         local y = math.ceil(i / 5) - 3

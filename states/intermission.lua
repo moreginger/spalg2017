@@ -1,12 +1,14 @@
 package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
+local tween = require 'tween.tween'
 
 require 'gfx'
 
 -- Short intermission between rounds
 local intermission = {
-    name = 'intermission'
+    name = 'intermission',
+    dot_tween = nil
 }
 
 local _firstToWins = 25
@@ -18,6 +20,7 @@ function intermission:enter(other)
     self.env = other.env
     self.map = other.map
     self.players = other.players
+    self.dot_tween = nil
 
     local playing = 0;
     for i = 1, #self.players do
@@ -28,9 +31,14 @@ function intermission:enter(other)
     if playing > 0 then
         for i = 1, #self.players do
             if self.players[i].alive then
+                -- Won a round
+                self.players[i].alive = false
                 if self.players[i]:won() >= _firstToWins then
                     self.env.winner = i
                 end
+                local start_pos = self.players[i].active:endPos()
+                local end_pos = { x = self.players[i].status.display_x, y = self.players[i].status.display_y }
+                self.dot_tween = tween.new(math.pi, start_pos, end_pos, 'inCubic')
             end
         end
     end
@@ -45,8 +53,11 @@ function intermission:enter(other)
 end
 
 function intermission:update(dt)
-    local dr = dt * self.env.dt_speedup
-    self.map:update(4 * dr)
+    local dr = 4 * dt * self.env.dt_speedup
+    self.map:update(dr)
+    if self.dot_tween ~= nil then
+        self.dot_tween:update(dr)
+    end
     if self.map:intersectsSelf() then
         Gamestate.switch(self.states.game)
     end
@@ -54,6 +65,9 @@ end
 
 function intermission:draw()
     drawGame(self.players, self.map, true, self.shaders)
+    if self.dot_tween ~= nil then
+        love.graphics.circle('line', self.dot_tween.subject.x, self.dot_tween.subject.y, 5)
+    end
 end
 
 function intermission:focus(focus)

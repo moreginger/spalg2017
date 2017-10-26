@@ -123,8 +123,15 @@ end
 
 function Arc:drawEndDot(size)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.circle('fill', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius * size)
-    love.graphics.circle('line', self.x + math.cos(self.end_rads) * self.radius, self.y + math.sin(self.end_rads) * self.radius, self.dot_radius * size)
+    local point = self:endPos()
+    love.graphics.circle('fill', point.x, point.y, self.dot_radius * size)
+    love.graphics.circle('line', point.x, point.y, self.dot_radius * size)
+end
+
+function Arc:endPos()
+    local x = self.x + math.cos(self.end_rads) * self.radius
+    local y = self.y + math.sin(self.end_rads) * self.radius
+    return { x = x, y = y }
 end
 
 function Arc:new(o)
