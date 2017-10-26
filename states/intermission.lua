@@ -9,7 +9,7 @@ local intermission = {
     name = 'intermission'
 }
 
-local _firstToWins = 2
+local _firstToWins = 25
 
 -- other: game.
 function intermission:enter(other)

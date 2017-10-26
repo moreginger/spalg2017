@@ -50,7 +50,7 @@ function init:init()
 
     local font_size = env.trail_radius * 1.5
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
-    self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
+    self.status_tmpl = Status:new({ step = env.trail_radius / 2 })
 
     self.shaders.trail = moonshine(moonshine.effects.fastgaussianblur)
     self.shaders.trail.parameters = {
@@ -94,7 +94,7 @@ function init:enter()
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = display_offset }),
+        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = display_offset, wins = 15 }),
         active = arc:new({player = 2, end_rads = math.pi * 7 / 4})
     })
     self.players[3] = Player:new({

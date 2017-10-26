@@ -2,15 +2,31 @@ Status = {
     wins = 0,
     display_x = 0,
     display_y = 0,
-    display_w = 0,
-    display_h = 0,
-    font = nil
+    step = 0
 }
 
 function Status:draw(angle)
-    love.graphics.setFont(self.font)
+    love.graphics.translate(self.display_x, self.display_y)
+    love.graphics.rotate(angle)
+    love.graphics.setColor(150, 150, 150, 255)
+    local length = 2.3
+    local step = self.step
+    -- TODO size by screen
+    for i = -1.5, 1.5, 1 do
+        love.graphics.line(i * step, -length * step, i * step, length * step)
+        love.graphics.line(-length * step, i * step, length * step, i * step)
+    end
     local wins = math.ceil(self.wins)
-    love.graphics.printf(wins, self.display_x, self.display_y, self.display_w, 'center', angle, 1, 1, self.display_w / 2, self.display_h  / 2)
+
+    love.graphics.setColor(255, 255, 255, 255)
+    local r = math.floor(step / 3)
+    for i = 1, wins, 1 do
+        local x = (i - 1) % 5 - 2
+        local y = math.ceil(i / 5) - 3
+        love.graphics.circle('line', x * step, y * step, r)
+    end
+
+    love.graphics.origin()
 end
 
 function Status:addWin()
