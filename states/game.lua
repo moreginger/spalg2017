@@ -96,7 +96,7 @@ function game:_resetPlayers()
             start_rads = angle,
             end_rads = angle,
             direction = 'cw',
-            p = p.active.player
+            player = p.active.player
         })
 
         -- TODO move arc construction in here?
