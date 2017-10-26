@@ -8,7 +8,8 @@ require 'gfx'
 -- Short intermission between rounds
 local intermission = {
     name = 'intermission',
-    dot_tween = nil
+    dot_tween = nil,
+    status_tweens = {}
 }
 
 local _firstToWins = 25
@@ -24,9 +25,11 @@ function intermission:enter(other)
 
     local playing = 0;
     for i = 1, #self.players do
-        if self.players[i]:playing() then
+        local p = self.players[i]
+        if p:playing() then
             playing = playing + 1
         end
+        self.status_tweens[i] = tween.new(math.pi, { angle = p.status.angle % 2 * math.pi + 2 * math.pi }, { angle = p.start_rads }, 'inOutCubic')
     end
     if playing > 0 then
         for i = 1, #self.players do
@@ -57,6 +60,11 @@ function intermission:update(dt)
     self.map:update(dr)
     if self.dot_tween ~= nil then
         self.dot_tween:update(dr)
+    end
+    for i = 1, #self.status_tweens, 1 do
+        local t = self.status_tweens[i]
+        t:update(dr)
+        self.players[i].status.angle = t.subject.angle
     end
     if self.map:intersectsSelf() then
         Gamestate.switch(self.states.game)
