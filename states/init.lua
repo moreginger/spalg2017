@@ -4,7 +4,7 @@ local Gamestate = require 'hump.gamestate'
 
 local HC = require 'hc'
 local shapes = require 'hc.shapes'
-local shine = require 'shine'
+local moonshine = require 'moonshine'
 
 require 'arc'
 require 'control'
@@ -52,8 +52,14 @@ function init:init()
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
-    self.shaders.trail = shine.bilineargaussianblur({ taps = 9, offset_type = 'center', offset = env.trail_width})
-    --:chain(shine.colorgrade({ grade = {2, 2, 2} }))
+    self.shaders.trail = moonshine(moonshine.effects.fastgaussianblur)
+    self.shaders.trail.parameters = {
+        fastgaussianblur = {
+            taps = 9,
+            offset = env.trail_width --, -- Compensation for HDPI with mandatory low taps.
+            -- offset_type = 'center'
+        }
+    }
     self.shaders.cfg_all = { trails = true, status = true }
 end
 
