@@ -56,8 +56,8 @@ function init:init()
     self.shaders.trail.parameters = {
         fastgaussianblur = {
             taps = 9,
-            offset = env.trail_width --, -- Compensation for HDPI with mandatory low taps.
-            -- offset_type = 'center'
+            offset = env.trail_width, -- Compensation for HDPI with mandatory low taps.
+            offset_type = 'center'
         }
     }
     self.shaders.cfg_all = { trails = true, status = true }
