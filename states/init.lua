@@ -52,7 +52,7 @@ function init:init()
     local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ font = font, display_w = font_size * 3, display_h = font_size })
 
-    self.shaders.trail = shine.bilineargaussianblur({ taps = 9, offset = env.trail_width})
+    self.shaders.trail = shine.bilineargaussianblur({ taps = 9, offset_type = 'center', offset = env.trail_width})
     --:chain(shine.colorgrade({ grade = {2, 2, 2} }))
     self.shaders.cfg_all = { trails = true, status = true }
 end

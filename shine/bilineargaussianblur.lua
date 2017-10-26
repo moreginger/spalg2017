@@ -24,16 +24,21 @@ SOFTWARE.
 
 -- Bilinear Gaussian blur filter as detailed here: http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 -- Produces near identical results to a standard Gaussian blur by using sub-pixel sampling,
--- this allows us to do ~1/2 the number of lookups.
+-- this allows us to do ~1/2 the number of pixel lookups.
 
 -- unroll convolution loop
-local function build_shader(taps, offset, sigma)
+local function build_shader(taps, offset, offset_type, sigma)
 	taps = math.floor(taps)
-	sigma = sigma >= 1 and sigma or (taps - 1) * offset / 6
-
 	if taps < 3 or taps % 2 ~= 1 then
-	    error(('Taps must be >=3 and odd. Was %d.'):format(taps))
+	    error(('taps must be >=3 and odd. Was %d.'):format(taps))
 	end
+
+	if offset_type ~= 'weighted' and offset_type ~= 'center' then
+	    error(('offset_type must be \'weighted\' or \'center\'. Was %s.'):format(offset_type))
+	end
+
+	sigma = sigma >= 1 and sigma or (taps - 1) * offset / 6
+	sigma = math.max(sigma, 1)
 
 	local steps = (taps + 1) / 2
 
@@ -54,14 +59,13 @@ local function build_shader(taps, offset, sigma)
 	-- Calculate offsets and weights for sub-pixel samples.
 	local offsets = {}
 	local weights = {}
-	local gnorm = 0
 	for i = #g_weights, 2, -2 do
 		local oA, oB = g_offsets[i], g_offsets[i - 1]
 		local wA, wB = g_weights[i], g_weights[i - 1]
-		wB = i - 1 == 1 and wB / 2 or wB -- On final tap the middle is getting sampled twice so half weight.
-		offsets[#offsets + 1] = (oA + oB) / 2
-		weights[#weights + 1] = wA + wB
-		gnorm = gnorm + wA + wB
+		wB = oB == 0 and wB / 2 or wB -- On center tap the middle is getting sampled twice so half weight.
+		local weight = wA + wB
+		offsets[#offsets + 1] = offset_type == 'center' and (oA + oB) / 2 or (oA * wA + oB * wB) / weight
+		weights[#weights + 1] = weight
 	end
 
 	local code = {[[
@@ -85,7 +89,6 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 sc) {]]}
 	code[#code+1] = ('return %f * vec4(c, 1.0f) * color; }'):format(1 / norm)
 
 	local shader = table.concat(code)
-	-- print(shader)
 	return love.graphics.newShader(shader)
 end
 
@@ -95,8 +98,8 @@ description = "Bilinear Gaussian blur shader (http://rastergrid.com/blog/2010/09
 
 new = function(self)
 	self.canvas_h, self.canvas_v = love.graphics.newCanvas(), love.graphics.newCanvas()
-	self.taps, self.offset, self.sigma = 7, 1, -1
-	self.shader = build_shader(self.taps, self.offset, self.sigma)
+	self.taps, self.offset, self.offset_type, self.sigma = 7, 1, 'weighted', -1
+	self.shader = build_shader(self.taps, self.offset, self.offset_type, self.sigma)
 
 	self.shader:send("direction", {1.0, 0.0} )
 end,
@@ -122,7 +125,7 @@ draw = function(self, func, ...)
 	-- second pass (vertical blur)
 	self.shader:send('direction', {0, 1 / love.graphics.getHeight()})
 	love.graphics.draw(self.canvas_v, 0,0)
-	
+
 	-- restore blendmode, shader and canvas
 	love.graphics.setBlendMode(b)
 	love.graphics.setShader(s)
@@ -139,6 +142,10 @@ set = function(self, key, value)
 		-- For highest quality this should be <=1 but if the image has low entropy we
 		-- can approximate the blur with a number > 1 and less taps, for better performance.
 		self.offset = tonumber(value)
+	elseif key == "offset_type" then
+		-- Offset type, either 'weighted' or 'center'.
+		-- 'weighted' gives a more accurate gaussian decay but can introduce modulation
+		-- for high frequency details.
 	elseif key == "sigma" then
 		-- Sigma value for gaussian distribution. You don't normally need to set this.
 	    self.sigma = tonumber(value)
@@ -146,7 +153,7 @@ set = function(self, key, value)
 		error("Unknown property: " .. tostring(key))
 	end
 
-	self.shader = build_shader(self.taps, self.offset, self.sigma)
+	self.shader = build_shader(self.taps, self.offset, self.offset_type, self.sigma)
 	return self
 end
 }
