@@ -1,14 +1,17 @@
 Status = {
+    playing = false,
     wins = 0,
+
     display_x = 0,
     display_y = 0,
     step = 0
 }
 
-function Status:draw(angle)
+function Status:draw(angle, total_rads)
     love.graphics.translate(self.display_x, self.display_y)
     love.graphics.rotate(angle)
-    love.graphics.setColor(150, 150, 150, 255)
+    local alpha = self.playing and 255 or 128 + math.sin(total_rads * 2) * 64
+    love.graphics.setColor(150, 150, 150, alpha)
     local length = 2.3
     local step = self.step
     -- TODO size by screen
@@ -18,7 +21,7 @@ function Status:draw(angle)
     end
     local wins = math.ceil(self.wins)
 
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(255, 255, 255, alpha)
     local r = math.floor(step / 3)
     for i = 1, wins, 1 do
         local x = (i - 1) % 5 - 2

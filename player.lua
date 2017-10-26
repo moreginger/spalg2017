@@ -55,6 +55,7 @@ end
 
 function Player:_changeDirection(collider)
     self.toggle_time = 0
+    self.status.playing = true
     self.trail[#self.trail+1] = self.active
     self.active = self.active:changeDirection()
     self:addToCollider(collider)
@@ -76,7 +77,7 @@ function Player:draw(cfg)
         end
     end
     if cfg.status then
-        self.status:draw(active:rads() + math.pi)
+        self.status:draw(active:rads() + math.pi, active.total_rads)
     end
 end
 
@@ -86,12 +87,13 @@ function Player:won()
 end
 
 function Player:playing()
-    return self.toggle_time ~= nil
+    return self.status.playing
 end
 
 function Player:reset(arc)
     self.active = arc
     self.toggle_time = nil
+    self.status.playing = false
     self.trail = {}
     self.alive = true
 end
