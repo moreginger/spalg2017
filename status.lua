@@ -3,7 +3,8 @@ local vector = require 'hump.vector'
 
 Status = {
     display_v = vector(0, 0),
-    step = 0,
+    dot_size = 0,
+    step_size = 0,
 
     playing = false,
     wins = 0,
@@ -24,10 +25,10 @@ end
 function Status:draw(total_rads)
     love.graphics.translate(self.display_v.x, self.display_v.y)
     love.graphics.rotate(self.angle)
-    local alpha = self.playing and 255 or 128 + math.sin(total_rads * 2) * 64
-    love.graphics.setColor(150, 150, 150, alpha)
+    local alpha = self.playing and 255 or 128 + math.cos(total_rads * 2) * 64
+    love.graphics.setColor(255, 255, 255, alpha)
     local length = 2.3
-    local step = self.step
+    local step = self.step_size
     for i = -1.5, 1.5, 1 do
         love.graphics.line(i * step, -length * step, i * step, length * step)
         love.graphics.line(-length * step, i * step, length * step, i * step)
@@ -38,21 +39,20 @@ function Status:draw(total_rads)
     local r = math.floor(step / 4)
     for i = 1, wins, 1 do
         local pos = self:_dotPos(i)
-        love.graphics.circle('line', pos.x, pos.y, r)
+        love.graphics.circle('fill', pos.x, pos.y, self.dot_size)
     end
 
     love.graphics.origin()
 
     if self.win_tween ~= nil then
-        -- TODO size etc
-        love.graphics.circle('line', self.win_tween.subject.x, self.win_tween.subject.y, 4)
+        love.graphics.circle('fill', self.win_tween.subject.x, self.win_tween.subject.y, self.dot_size)
     end
 end
 
 function Status:_dotPos(win)
     local x = (win - 1) % 5 - 2
     local y = math.ceil(win / 5) - 3
-    return { x = x * self.step, y = y * self.step }
+    return { x = x * self.step_size, y = y * self.step_size }
 end
 
 -- Called at start of intermission state.

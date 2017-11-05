@@ -51,7 +51,7 @@ function init:init()
 
     local font_size = env.trail_radius * 2
     self.states.pause.font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
-    self.status_tmpl = Status:new({ step = env.trail_radius / 2 })
+    self.status_tmpl = Status:new({ dot_size = env.trail_radius / 8, step_size = env.trail_radius / 2 })
 
     self.shaders.trail = moonshine(moonshine.effects.fastgaussianblur)
     self.shaders.trail.parameters = {
@@ -121,6 +121,7 @@ function init:enter()
         local start_rads = (3 + i * 2) % 8 / 4 * math.pi
         p.start_rads = start_rads
         p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
+        p.status:update(0, start_rads)
     end
 end
 
