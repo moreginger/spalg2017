@@ -49,8 +49,8 @@ function init:init()
     env.trail_radius = math.min(screen_x, screen_y) / 16
     env.trail_width = math.max(1, math.floor(env.trail_radius / 32))
 
-    local font_size = env.trail_radius * 1.5
-    local font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
+    local font_size = env.trail_radius * 2
+    self.states.pause.font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
     self.status_tmpl = Status:new({ step = env.trail_radius / 2 })
 
     self.shaders.trail = moonshine(moonshine.effects.fastgaussianblur)
@@ -61,6 +61,19 @@ function init:init()
             offset_type = 'center'
         }
     }
+
+    self.shaders.pause = moonshine(moonshine.effects.fastgaussianblur).chain(moonshine.effects.colorgradesimple)
+    self.shaders.pause.parameters = {
+        fastgaussianblur = {
+            taps = 19,
+            offset = env.trail_width, -- Compensation for HDPI with mandatory low taps.
+            offset_type = 'center'
+        },
+        colorgradesimple = {
+            factors = { 3, 3, 3 }
+        }
+    }
+
     self.shaders.cfg_all = { trails = true, status = true }
 end
 
