@@ -37,15 +37,15 @@ moonshine.draw_shader = function(buffer, shader)
 end
 
 moonshine.chain = function(effect)
-  local front, back = love.graphics.newCanvas(), love.graphics.newCanvas()
-  local buffer = function()
-    back, front = front, back
-    return front, back
-  end
-
+  
   local chain = {}
-
+  
   chain.draw = function(func, ...)
+    local front, back = love.graphics.newCanvas(), love.graphics.newCanvas()
+    local buffer = function()
+      back, front = front, back
+      return front, back
+    end
     -- save state
     local canvas = love.graphics.getCanvas()
     local shader = love.graphics.getShader()
