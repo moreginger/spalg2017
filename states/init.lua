@@ -93,7 +93,7 @@ function init:enter()
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), wins = 15 })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset) })
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
