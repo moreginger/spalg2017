@@ -5,6 +5,7 @@ local Gamestate = require 'hump.gamestate'
 local HC = require 'hc'
 local shapes = require 'hc.shapes'
 local moonshine = require 'moonshine'
+local vector = require 'hump.vector'
 
 require 'arc'
 require 'control'
@@ -88,19 +89,19 @@ function init:enter()
     local display_offset = trail_radius * 2;
     self.players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = self.status_tmpl:new({ display_x = display_offset, display_y = display_offset })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset) })
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = display_offset, wins = 15 })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), wins = 15 })
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_x = env.screen_x - display_offset, display_y = env.screen_y - display_offset })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset) })
     })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_x = display_offset, display_y = env.screen_y - display_offset })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset) })
     })
     for i = 1, #self.players, 1 do
         local p = self.players[i]

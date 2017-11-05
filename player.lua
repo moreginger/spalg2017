@@ -12,7 +12,7 @@ Player = {
 
 function Player:update(dr)
     self.active:update(dr)
-    self.status.angle = self.active.end_rads
+    self.status:update(dr, self.active.end_rads)
     if self.toggle_time ~= nil then
         self.toggle_time = self.toggle_time + dr
     end

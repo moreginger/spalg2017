@@ -1,21 +1,33 @@
+local tween = require 'tween.tween'
+local vector = require 'hump.vector'
+
 Status = {
+    display_v = vector(0, 0),
+    step = 0,
+
     playing = false,
     wins = 0,
 
-    display_x = 0,
-    display_y = 0,
     angle = 0,
-    step = 0
+    win_tween = nil
 }
 
+-- Only called during intermission to animate win.
+function Status:update(dr, angle)
+    self.angle = angle
+    if self.win_tween ~= nil then
+        self:_updateWinTweenTarget()
+        self.win_tween:update(dr)
+    end
+end
+
 function Status:draw(total_rads)
-    love.graphics.translate(self.display_x, self.display_y)
+    love.graphics.translate(self.display_v.x, self.display_v.y)
     love.graphics.rotate(self.angle)
     local alpha = self.playing and 255 or 128 + math.sin(total_rads * 2) * 64
     love.graphics.setColor(150, 150, 150, alpha)
     local length = 2.3
     local step = self.step
-    -- TODO size by screen
     for i = -1.5, 1.5, 1 do
         love.graphics.line(i * step, -length * step, i * step, length * step)
         love.graphics.line(-length * step, i * step, length * step, i * step)
@@ -25,16 +37,48 @@ function Status:draw(total_rads)
     love.graphics.setColor(255, 255, 255, alpha)
     local r = math.floor(step / 4)
     for i = 1, wins, 1 do
-        local x = (i - 1) % 5 - 2
-        local y = math.ceil(i / 5) - 3
-        love.graphics.circle('line', x * step, y * step, r)
+        local pos = self:_dotPos(i)
+        love.graphics.circle('line', pos.x, pos.y, r)
     end
 
     love.graphics.origin()
+
+    if self.win_tween ~= nil then
+        -- TODO size etc
+        love.graphics.circle('line', self.win_tween.subject.x, self.win_tween.subject.y, 4)
+    end
 end
 
-function Status:addWin()
-    self.wins = self.wins + 1
+function Status:_dotPos(win)
+    local x = (win - 1) % 5 - 2
+    local y = math.ceil(win / 5) - 3
+    return { x = x * self.step, y = y * self.step }
+end
+
+-- Called at start of intermission state.
+function Status:prepareWin(start_pos)
+    self.win_tween = tween.new(math.pi, start_pos, { x = 0, y = 0 }, 'inCubic')
+    self:_updateWinTweenTarget()
+end
+
+function Status:_updateWinTweenTarget()
+    local end_pos = self:_dotPos(self.wins + 1)
+
+    -- TODO use vector more?
+    end_pos = vector(end_pos.x, end_pos.y)
+    end_pos:rotateInplace(self.angle)
+    end_pos = self.display_v + end_pos
+
+    self.win_tween.target.x, self.win_tween.target.y = end_pos:unpack()
+end
+
+-- Called at end of intermission state.
+function Status:confirmWin()
+    if self.win_tween ~= nil then
+        self.wins = self.wins + 1
+        self.win_tween = nil
+    end
+    return self.wins
 end
 
 function Status:subWins(wins)
