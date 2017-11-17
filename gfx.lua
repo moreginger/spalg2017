@@ -1,9 +1,20 @@
 local c1, intermediate = love.graphics.newCanvas(), love.graphics.newCanvas()
 
-function build_shader(taps, offset, offset_type, sigma, mult)
+local trail_blur, pause_blur
+
+local gfx = {
+}
+
+function gfx.init(trail_width)
+  trail_blur = _build_shader(9, 1, 'center', -1, 1)
+  pause_blur = _build_shader(29, 1, 'center', -1, 2)
+end
+
+function _build_shader(taps, offset, offset_type, sigma, mult)
     taps = math.floor(taps)
     sigma = sigma >= 1 and sigma or (taps - 1) * offset / 6
     sigma = math.max(sigma, 1)
+    mult = math.sqrt(mult) -- We apply this twice (two passes)
 
     local steps = (taps + 1) / 2
 
@@ -56,10 +67,7 @@ function build_shader(taps, offset, offset_type, sigma, mult)
     return love.graphics.newShader(shader)
 end
 
--- TODO width
-local trail_blur = build_shader(9, 1, 'center', -1, 1)
-
-function drawGame(players, map, draw_map_end, shaders)
+function gfx.drawGame(players, map, draw_map_end)
     love.graphics.setColor(255, 255, 255, 255)
 
     local ps = love.graphics.getShader()
@@ -68,20 +76,18 @@ function drawGame(players, map, draw_map_end, shaders)
 
     love.graphics.setCanvas(c1)
     love.graphics.clear()
-    _drawGameInternal(players, map, draw_map_end, shaders.cfg_all)
+    _drawGameInternal(players, map, draw_map_end)
     _applyBlur(trail_blur, pc)
-    _drawGameInternal(players, map, draw_map_end, shaders.cfg_all) -- If we apply from the canvas instead the quality of aliasing is lower.
+    _drawGameInternal(players, map, draw_map_end) -- If we apply from the canvas instead the quality of aliasing is lower.
 end
 
-local pause_blur = build_shader(29, 1, 'center', -1, 1.4) -- This multiplier is weird, it seems to have a very nonlinear response.
-
-function pauseBlur(dest)
+function gfx.pauseBlur(dest)
     _applyBlur(pause_blur, dest)
 end
 
-function _drawGameInternal(players, map, draw_map_end, cfg)
+function _drawGameInternal(players, map, draw_map_end)
     for i = 1, #players do
-        players[i]:draw(cfg)
+        players[i]:draw()
       end
       map:draw()
       if draw_map_end then
@@ -107,3 +113,5 @@ function _applyBlur(shader, dest)
   love.graphics.setBlendMode(pbm)
   love.graphics.setShader(ps)
 end
+
+return gfx

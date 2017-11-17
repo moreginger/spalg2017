@@ -6,7 +6,7 @@ local HC = require 'hc'
 
 require 'arc'
 require 'control'
-require 'gfx'
+local gfx = require 'gfx'
 require 'player'
 require 'status'
 
@@ -72,7 +72,7 @@ function game:update(dt)
 end
 
 function game:draw()
-    drawGame(self.players, self.map, false, self.shaders)
+    gfx.drawGame(self.players, self.map, false, self.shaders)
 end
 
 function game:focus(focus)

@@ -2,7 +2,7 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
-require 'gfx'
+local gfx = require 'gfx'
 
 -- Game is paused
 local pause = {
@@ -23,7 +23,7 @@ function pause:draw()
 
         love.graphics.setCanvas(source)
         self.previous:draw()
-        pauseBlur(blurred)
+        gfx.pauseBlur(blurred)
         self.canvas = blurred
 
         love.graphics.setCanvas(pc)

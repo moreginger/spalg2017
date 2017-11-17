@@ -10,7 +10,7 @@ require 'arc'
 require 'control'
 require 'player'
 require 'status'
-require 'gfx'
+local gfx = require 'gfx'
 
 local intermission = require 'states.intermission'
 local game = require 'states.game'
@@ -47,6 +47,8 @@ function init:init()
     env.screen_y = screen_y
     env.trail_radius = math.min(screen_x, screen_y) / 16
     env.trail_width = math.max(1, math.floor(env.trail_radius / 32))
+
+    gfx.init(env.trail_width)
 
     local font_size = env.trail_radius * 2
     self.states.pause.font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
@@ -111,7 +113,7 @@ function init:update(dt)
 end
 
 function init:draw()
-    drawGame(self.players, self.map, true, self.shaders)
+    gfx.drawGame(self.players, self.map, true)
 end
 
 function init:focus(focus)
