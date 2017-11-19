@@ -4,8 +4,9 @@ States
 --> enter
 ..> push/pop
 
-init --> intermission
-intermission --> game
+init --> game
 game --> intermission
+intermission --> game / fin
+fin --> init
 
 any ..> pause ..> any

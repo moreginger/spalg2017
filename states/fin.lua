@@ -2,7 +2,7 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
-require 'gfx'
+local gfx = require 'gfx'
 
 -- Post game state.
 local fin = {}
@@ -33,7 +33,7 @@ function fin:update(dt)
 end
 
 function fin:draw()
-    drawGame(self.players, self.map, false, self.shaders)
+    gfx.drawGame(self.players, self.map, false, self.shaders)
 end
 
 function fin:focus(focus)

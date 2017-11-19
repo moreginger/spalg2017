@@ -2,15 +2,36 @@ package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
 
+local gfx = require 'gfx'
+
 -- Game is paused
-local pause = {}
+local pause = {
+    font = nil,
+    canvas = nil
+}
 
 function pause:enter(previous)
     self.previous = previous
+    self.shaders = previous.shaders
+    self.canvas = nil
 end
 
 function pause:draw()
-    self.previous:draw()
+    if self.canvas == nil then
+        local source, blurred = love.graphics.newCanvas(), love.graphics.newCanvas()
+        local pc = love.graphics.getCanvas()
+
+        love.graphics.setCanvas(source)
+        self.previous:draw()
+        gfx.pauseBlur(blurred)
+        self.canvas = blurred
+
+        love.graphics.setCanvas(pc)
+    end
+
+    love.graphics.setFont(self.font)
+    love.graphics.print('spalg', 10, 10)
+    love.graphics.draw(self.canvas, 0, 0)
 end
 
 function pause:focus(f)
