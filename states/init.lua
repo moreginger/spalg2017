@@ -76,7 +76,8 @@ function init:enter()
     local arc = Arc:new({x = -trail_radius, y = -trail_radius, radius = trail_radius, dot_radius = dot_radius, width = width})
 
     local map_radius = math.min(env.screen_x, env.screen_y) / 2.05 -- Fit onscreen
-    self.map = Arc:new({x = env.screen_x / 2, y = env.screen_y / 2, radius = map_radius, dot_radius = dot_radius * 1.5, width = env.trail_width})
+    local map_start_rads = 3 * math.pi / 4
+    self.map = Arc:new({x = env.screen_x / 2, y = env.screen_y / 2, radius = map_radius, dot_radius = dot_radius * 1.5, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, width = env.trail_width})
 
     local display_offset = trail_radius * 2;
     self.players[1] = Player:new({
@@ -102,6 +103,7 @@ function init:enter()
         p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
         p.status:update(0, start_rads)
     end
+    Gamestate.push(self.states.pause)
 end
 
 function init:update(dt)
