@@ -28,3 +28,9 @@ jobs:
       # Runs a single command using the runners shell
       - name: Build
         run: ./build.sh
+
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          name: spalg.love
+          path: ./spalg.love
