@@ -121,17 +121,30 @@ function Arc:draw()
     love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
-function Arc:drawEndDot(size)
+function Arc:drawEnd(trail_length_font, size, trail_length)
     love.graphics.setColor(255, 255, 255, 255)
     local point = self:endPos()
     love.graphics.circle('fill', point.x, point.y, self.dot_radius * size)
     love.graphics.circle('line', point.x, point.y, self.dot_radius * size)
+
+    love.graphics.setFont(trail_length_font)
+    love.graphics.translate(point.x, point.y)
+    love.graphics.rotate(self.end_rads)
+    trail_length_str = string.format('%.2f', trail_length)
+    local font_height = trail_length_font:getHeight()
+    love.graphics.setColor(0, 255, 0, 127)
+    love.graphics.print(trail_length_str, font_height / 1.5, -font_height / 2.4)
+    love.graphics.origin()
 end
 
 function Arc:endPos()
     local x = self.x + math.cos(self.end_rads) * self.radius
     local y = self.y + math.sin(self.end_rads) * self.radius
     return { x = x, y = y }
+end
+
+function Arc:length()
+    return math.abs(self.end_rads - self.start_rads)
 end
 
 function Arc:new(o)

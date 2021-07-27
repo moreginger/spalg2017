@@ -36,7 +36,6 @@ function Status:draw(total_rads)
     local wins = math.ceil(self.wins)
 
     love.graphics.setColor(255, 255, 255, alpha)
-    local r = math.floor(step / 4)
     for i = 1, wins, 1 do
         local pos = self:_dotPos(i)
         love.graphics.circle('fill', pos.x, pos.y, self.dot_size)

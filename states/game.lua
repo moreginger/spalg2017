@@ -72,7 +72,7 @@ function game:update(dt)
 end
 
 function game:draw()
-    gfx.drawGame(self.players, self.map, false, self.shaders)
+    gfx.drawGame(self.players, self.map, false)
 end
 
 function game:focus(focus)

@@ -48,7 +48,7 @@ function init:init()
     env.trail_radius = math.min(screen_x, screen_y) / 16
     env.trail_width = math.max(1, math.floor(env.trail_radius / 32))
 
-    gfx.init(env.trail_width)
+    gfx.init(env.trail_width, env.trail_radius)
 
     local font_size = env.trail_radius * 3
     self.states.pause.font = love.graphics.newFont('resources/comfortaa.bold.ttf', font_size)

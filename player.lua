@@ -5,6 +5,7 @@ Player = {
     active = nil,
     toggle_time = nil, -- Time since last direction change, or nil if none.
     trail = {},
+    trail_length = 0,
     alive = true,
     status = nil,
     control = nil
@@ -58,6 +59,7 @@ end
 function Player:_changeDirection(collider)
     self.toggle_time = 0
     self.status.playing = true
+    self.trail_length = self:length()
     self.trail[#self.trail+1] = self.active
     self.active = self.active:changeDirection()
     self:addToCollider(collider)
@@ -67,11 +69,11 @@ function Player:addToCollider(collider)
     self.active:addToCollider(collider)
 end
 
-function Player:draw()
+function Player:draw(trail_length_font)
     local active = self.active
     active:draw()
     if self.alive then
-        active:drawEndDot(2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time * 4) or 1))
+        active:drawEnd(trail_length_font, 2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time * 4) or 1), self:length())
     end
     for i = 1, #self.trail do
         self.trail[i]:draw()
@@ -88,11 +90,16 @@ function Player:playing()
     return self.status.playing
 end
 
+function Player:length()
+    return self.trail_length + self.active:length()
+end
+
 function Player:reset(arc)
     self.active = arc
     self.toggle_time = nil
     self.status.playing = false
     self.trail = {}
+    self.trail_length = 0
     self.alive = true
 end
 
