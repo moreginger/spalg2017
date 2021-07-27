@@ -115,14 +115,14 @@ function isBetween(start_rads, end_rads, query_rads)
     return query_rads <= end_rads
 end
 
-function Arc:draw()
-    love.graphics.setColor(255, 255, 255, 255)
+function Arc:drawArc(trail_color)
+    love.graphics.setColor(trail_color[1], trail_color[2], trail_color[3], trail_color[4])
     love.graphics.setLineWidth(self.width)
     love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
 end
 
-function Arc:drawEnd(trail_length_font, size, trail_length)
-    love.graphics.setColor(255, 255, 255, 255)
+function Arc:drawEnd(trail_length_font, trail_color, size, trail_length)
+    love.graphics.setColor(trail_color[1], trail_color[2], trail_color[3], trail_color[4])
     local point = self:endPos()
     love.graphics.circle('fill', point.x, point.y, self.dot_radius * size)
     love.graphics.circle('line', point.x, point.y, self.dot_radius * size)
@@ -132,7 +132,7 @@ function Arc:drawEnd(trail_length_font, size, trail_length)
     love.graphics.rotate(self.end_rads)
     trail_length_str = string.format('%.2f', trail_length)
     local font_height = trail_length_font:getHeight()
-    love.graphics.setColor(0, 255, 0, 127)
+    love.graphics.setColor(1, 1, 1, 0.5)
     love.graphics.print(trail_length_str, font_height / 1.5, -font_height / 2.4)
     love.graphics.origin()
 end

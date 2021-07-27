@@ -69,14 +69,15 @@ function Player:addToCollider(collider)
     self.active:addToCollider(collider)
 end
 
-function Player:draw(trail_length_font)
+function Player:draw(trail_length_font, trail_color)
     local active = self.active
-    active:draw()
+    active:drawArc(trail_color)
     if self.alive then
-        active:drawEnd(trail_length_font, 2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time * 4) or 1), self:length())
+        local end_size = 2 - (self.toggle_time ~= nil and math.min(1, self.toggle_time * 4) or 1)
+        active:drawEnd(trail_length_font, trail_color, end_size, self:length())
     end
     for i = 1, #self.trail do
-        self.trail[i]:draw()
+        self.trail[i]:drawArc(trail_color)
     end
     self.status:draw(active.total_rads)
 end

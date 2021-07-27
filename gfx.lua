@@ -1,12 +1,13 @@
 local c1, intermediate = love.graphics.newCanvas(), love.graphics.newCanvas()
 
-local trail_length_font, trail_blur, pause_blur
+local trail_length_font, trail_color, trail_blur, pause_blur
 
 local gfx = {
 }
 
 function gfx.init(trail_width, trail_radius)
   trail_length_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius / 3.2)
+  trail_color = { 0, 1, 0, 1 }
   trail_blur = _build_shader(9, 1, 'center', -1, 1)
   pause_blur = _build_shader(29, 1, 'center', -1, 2)
 end
@@ -69,12 +70,7 @@ function _build_shader(taps, offset, offset_type, sigma, mult)
 end
 
 function gfx.drawGame(players, map, draw_map_end)
-    love.graphics.setColor(255, 255, 255, 255)
-
-    local ps = love.graphics.getShader()
     local pc = love.graphics.getCanvas()
-    local pbm = love.graphics.getBlendMode()
-
     love.graphics.setCanvas(c1)
     love.graphics.clear()
     _drawGameInternal(players, map, draw_map_end)
@@ -88,11 +84,11 @@ end
 
 function _drawGameInternal(players, map, draw_map_end)
     for i = 1, #players do
-        players[i]:draw(trail_length_font)
+        players[i]:draw(trail_length_font, trail_color)
       end
-      map:draw()
+      map:drawArc(trail_color)
       if draw_map_end then
-        map:drawEnd(trail_length_font, 1, map:length())
+        map:drawEnd(trail_length_font, trail_color, 1, map:length())
     end
 end
 
@@ -101,8 +97,9 @@ function _applyBlur(shader, dest)
   local ps = love.graphics.getShader()
   local pbm = love.graphics.getBlendMode()
 
+  love.graphics.setColor(1, 1, 1, 1)
   love.graphics.setShader(shader)
-  love.graphics.setBlendMode("alpha", "premultiplied")
+  love.graphics.setBlendMode('alpha', 'premultiplied')
   love.graphics.setCanvas(intermediate)
   love.graphics.clear()
   shader:send('direction', {1 / love.graphics.getWidth(), 0})

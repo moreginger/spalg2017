@@ -25,8 +25,8 @@ end
 function Status:draw(total_rads)
     love.graphics.translate(self.display_v.x, self.display_v.y)
     love.graphics.rotate(self.angle)
-    local alpha = self.playing and 255 or 128 + math.cos(total_rads * 2) * 64
-    love.graphics.setColor(255, 255, 255, alpha)
+    local alpha = self.playing and 1 or 0.5 + math.cos(total_rads * 2) * 0.5
+    love.graphics.setColor(1, 1, 1, alpha)
     local length = 2.3
     local step = self.step_size
     for i = -1.5, 1.5, 1 do
@@ -35,7 +35,7 @@ function Status:draw(total_rads)
     end
     local wins = math.ceil(self.wins)
 
-    love.graphics.setColor(255, 255, 255, alpha)
+    love.graphics.setColor(1, 1, 1, alpha)
     for i = 1, wins, 1 do
         local pos = self:_dotPos(i)
         love.graphics.circle('fill', pos.x, pos.y, self.dot_size)
