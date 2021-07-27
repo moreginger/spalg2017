@@ -6,3 +6,5 @@ https://play.google.com/store/apps/details?id=org.moreginger.spalg
 ## Attributions
 
 + Comfortaa Bold font by Johan Aakerlund ([OFL](https://scripts.sil.org/OFL)).
++ [Hump](https://github.com/vrld/hump/)
++ [HC](https://github.com/vrld/HC)
