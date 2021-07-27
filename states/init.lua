@@ -50,8 +50,8 @@ function init:init()
 
     gfx.init(env.trail_width)
 
-    local font_size = env.trail_radius * 2
-    self.states.pause.font = love.graphics.newFont('resources/Taurus-Mono-Outline-Regular.otf', font_size)
+    local font_size = env.trail_radius * 3
+    self.states.pause.font = love.graphics.newFont('resources/comfortaa.bold.ttf', font_size)
     self.status_tmpl = Status:new({ dot_size = env.trail_radius / 8, step_size = env.trail_radius / 2 })
     self.shaders.cfg_all = { trails = true, status = true }
 end
