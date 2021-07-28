@@ -19,15 +19,7 @@ end
 
 function fin:update(dt)
     self.time = self.time + dt
-    local noSwitch = false
-    for i = 1, #self.players do
-        local status = self.players[i].status
-        status:subWins(self.time / 10)
-        if status.wins > 0 then
-            noSwitch = true
-        end
-    end
-    if not noSwitch then
+    if self.time > 2 then
         self.can_leave = true
     end
 end

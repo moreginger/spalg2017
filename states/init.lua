@@ -49,7 +49,7 @@ function init:init()
 
     gfx.init(env.trail_width, env.trail_radius)
 
-    self.status_tmpl = Status:new({ dot_size = env.trail_radius / 8, step_size = env.trail_radius / 2 })
+    self.status_tmpl = Status:new({ line_width = env.trail_width, radius = env.trail_radius * 1.5 })
 
     self:reset()
 end
@@ -84,26 +84,25 @@ function init:reset()
     local display_offset = trail_radius * 2;
     self.players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset) })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset), display_angle = math.pi * 0.25 })
     })
     self.players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset) })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), display_angle = math.pi * 0.75 })
     })
     self.players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset) })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.25 })
     })
     self.players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset) })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.75 })
     })
     for i = 1, #self.players, 1 do
         local p = self.players[i]
         local start_rads = (3 + i * 2) % 8 / 4 * math.pi
         p.start_rads = start_rads
         p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
-        p.status:update(0, start_rads)
     end
 end
 

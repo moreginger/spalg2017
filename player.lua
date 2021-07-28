@@ -13,7 +13,6 @@ Player = {
 
 function Player:update(dr)
     self.active:update(dr)
-    self.status:update(dr, self.active.end_rads)
     if self.toggle_time ~= nil then
         self.toggle_time = self.toggle_time + dr
     end
@@ -79,12 +78,11 @@ function Player:draw(trail_length_font, trail_color)
     for i = 1, #self.trail do
         self.trail[i]:drawArc(trail_color)
     end
-    self.status:draw(active.total_rads)
+    self.status:draw()
 end
 
-function Player:won()
-    self.status:addWin()
-    return self.status.wins
+function Player:updateScore(delta)
+    return self.status:updateScore(delta)
 end
 
 function Player:playing()
