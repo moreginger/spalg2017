@@ -29,8 +29,7 @@ local init = {
     },
     map = nil,
     players = {},
-    states = {},
-    shaders = {}
+    states = {}
 }
 
 function init:init()
@@ -50,16 +49,19 @@ function init:init()
 
     gfx.init(env.trail_width, env.trail_radius)
 
-    local font_size = env.trail_radius * 3
-    self.states.pause.font = love.graphics.newFont('resources/comfortaa.bold.ttf', font_size)
     self.status_tmpl = Status:new({ dot_size = env.trail_radius / 8, step_size = env.trail_radius / 2 })
-    self.shaders.cfg_all = { trails = true, status = true }
+
+    self:reset()
 end
 
 function init:enter()
+    Gamestate.push(self.states.pause)
+end
+
+function init:reset()
     local env = self.env
 
-    env.dt_speedup = 1
+    env.dt_speedup = 2
     env.round = 0
     env.winner = 0
 
@@ -103,7 +105,6 @@ function init:enter()
         p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
         p.status:update(0, start_rads)
     end
-    Gamestate.push(self.states.pause)
 end
 
 function init:update(dt)

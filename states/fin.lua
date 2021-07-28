@@ -9,12 +9,12 @@ local fin = {}
 
 function fin:enter(game)
     self.states = game.states
-    self.shaders = game.shaders
     self.env = game.env
     self.players = game.players
     self.map = game.map
 
     self.time = 0
+    self.can_leave = false
 end
 
 function fin:update(dt)
@@ -28,17 +28,35 @@ function fin:update(dt)
         end
     end
     if not noSwitch then
-        Gamestate.switch(self.states.init)
+        self.can_leave = true
     end
 end
 
 function fin:draw()
-    gfx.drawGame(self.players, self.map, false, self.shaders)
+    gfx.drawGame(self.players, self.map, false)
+    if self.can_leave then
+        gfx.drawLogo()
+    end
 end
 
 function fin:focus(focus)
     if not focus then
         Gamestate.push(self.states.pause)
+    end
+end
+
+function fin:keypressed(key, scan_code, is_repeat)
+    self:_reset()
+end
+
+function fin:touchpressed(id, x, y, dx, dy, pressure)
+    self:_reset()
+end
+
+function fin:_reset()
+    if self.can_leave then
+        self.states.init:reset()
+        Gamestate.switch(self.states.init)
     end
 end
 

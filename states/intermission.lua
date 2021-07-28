@@ -16,7 +16,6 @@ local _firstToWins = 25
 -- other: game.
 function intermission:enter(other)
     self.states = other.states
-    self.shaders = other.shaders
     self.env = other.env
     self.map = other.map
     self.players = other.players
@@ -75,7 +74,7 @@ function intermission:update(dt)
 end
 
 function intermission:draw()
-    gfx.drawGame(self.players, self.map, true, self.shaders)
+    gfx.drawGame(self.players, self.map, true)
 end
 
 function intermission:focus(focus)

@@ -6,13 +6,11 @@ local gfx = require 'gfx'
 
 -- Game is paused
 local pause = {
-    font = nil,
     canvas = nil
 }
 
 function pause:enter(previous)
     self.previous = previous
-    self.shaders = previous.shaders
     self.canvas = nil
 end
 
@@ -29,15 +27,8 @@ function pause:draw()
         love.graphics.setCanvas(pc)
     end
 
-    love.graphics.setFont(self.font)
-    love.graphics.print('spalg', 10, 10)
     love.graphics.draw(self.canvas, 0, 0)
-end
-
-function pause:focus(f)
-    if f then
-        Gamestate.pop()
-    end
+    gfx.drawLogo()
 end
 
 function pause:keypressed(key, scan_code, is_repeat)

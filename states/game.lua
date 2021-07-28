@@ -16,7 +16,6 @@ local game = {}
 -- other: init / intermission
 function game:enter(other)
     self.states = other.states
-    self.shaders = other.shaders
     self.env = other.env
     self.players = other.players
     self.map = other.map

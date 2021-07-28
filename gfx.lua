@@ -1,6 +1,6 @@
 local c1, intermediate = love.graphics.newCanvas(), love.graphics.newCanvas()
 
-local trail_length_font, trail_color, trail_blur, pause_blur
+local logo_font, trail_length_font, trail_color, trail_blur, pause_blur
 
 local gfx = {
 }
@@ -9,7 +9,9 @@ function gfx.init(trail_width, trail_radius)
   trail_length_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius / 3.2)
   trail_color = { 0, 1, 0, 1 }
   trail_blur = _build_shader(9, 1, 'center', -1, 1)
-  pause_blur = _build_shader(29, 1, 'center', -1, 2)
+  logo_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius * 3)
+  logo_color = { 0.5, 1, 0.5, 0.8 }
+  pause_blur = _build_shader(19, 1, 'center', -1, 2)
 end
 
 function _build_shader(taps, offset, offset_type, sigma, mult)
@@ -80,6 +82,12 @@ end
 
 function gfx.pauseBlur(dest)
     _applyBlur(pause_blur, dest)
+end
+
+function gfx.drawLogo()
+  love.graphics.setColor(logo_color[1], logo_color[2], logo_color[3], logo_color[4])
+  love.graphics.setFont(logo_font)
+  love.graphics.print('spalg', 10, 10)
 end
 
 function _drawGameInternal(players, map, draw_map_end)
