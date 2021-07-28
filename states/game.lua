@@ -15,34 +15,31 @@ local game = {}
 
 -- other: init / intermission
 function game:enter(other)
-    self.states = other.states
     self.env = other.env
-    self.players = other.players
-    self.map = other.map
+    self.state = other.state
+    self.states = other.states
 
     self.collider = HC.new(100)
-    self.map:addToCollider(self.collider)
+    self.state.map:addToCollider(self.collider)
 
     self:_resetPlayers()
-
-    self.time = 0
 end
 
 function game:leave()
-    self.env.dt_speedup = self.env.dt_speedup + 0.1
-    self.env.round = self.env.round + 1
+    self.state.round = self.state.round + 1
 end
 
 function game:keypressed(key, scan_code, is_repeat)
-    local players = self.players
+    local players = self.state.players
     for i = 1, #players do
        players[i]:keypressed(key, self.collider)
     end
 end
 
 function game:touchpressed(id, x, y, dx, dy, pressure)
-    local players = self.players
-    if self.map.co:contains(x, y) then
+    local state = self.state
+    local players = state.players
+    if state.map.co:contains(x, y) then
         -- Mask play area to help discourage attempts to interact with it.
     else
         for i = 1, #players do
@@ -52,10 +49,13 @@ function game:touchpressed(id, x, y, dx, dy, pressure)
 end
 
 function game:update(dt)
-    self.time = self.time + dt
+    local env = self.env
+    local state = self.state
+    local players = state.players
 
-    local players = self.players
-    local dr = dt * self.env.dt_speedup
+    state.time_played = state.time_played + dt
+    local game_speed = env.min_speed + (env.max_speed - env.min_speed) * math.min(1, (state.time_played / env.speedup_time))
+    local dr = dt * game_speed
     local active = 0
     for i = 1, #players do
         if players[i].alive then
@@ -71,7 +71,7 @@ function game:update(dt)
 end
 
 function game:draw()
-    gfx.drawGame(self.players, self.map, false)
+    gfx.drawGame(self.state, false)
 end
 
 function game:focus(focus)
@@ -81,10 +81,13 @@ function game:focus(focus)
 end
 
 function game:_resetPlayers()
-    local map_x, map_y = self.map.x, self.map.y
-    local r = self.map.radius * 0.7
-    for i = 1, #self.players, 1 do
-        local p = self.players[i]
+    local state = self.state
+    local map = state.map
+    local players = state.players
+    local map_x, map_y = map.x, map.y
+    local r = map.radius * 0.7
+    for i = 1, #players, 1 do
+        local p = players[i]
         local angle = p.start_rads
         local arc = Arc:new({
             x = map_x + math.cos(angle) * r,

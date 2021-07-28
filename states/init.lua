@@ -20,16 +20,21 @@ local pause = require 'states.pause'
 -- (re)initialize game state
 local init = {
     env = {
-        screen_x,
-        screen_y,
-        trail_radius,
-        trail_width,
-        dt_speedup = 1,
-        round = 0
+        min_speed = 0.25 * math.pi, -- Speed in radians / s.
+        max_speed = 4 * math.pi,
+        speedup_time = 240, -- Time to reach max speed in s.
+        screen_x = 0,
+        screen_y = 0,
+        trail_radius = 0,
+        trail_width = 0,
+    },
+    state = {
+        players = {},
+        time_played = 0,
+        round = 0,
     },
     map = nil,
-    players = {},
-    states = {}
+    states = {},
 }
 
 function init:init()
@@ -60,10 +65,11 @@ end
 
 function init:reset()
     local env = self.env
+    local state = self.state
+    local players = state.players
 
-    env.dt_speedup = 2
-    env.round = 0
-    env.winner = 0
+    state.time_played = 0
+    state.round = 0
 
     local touch_x = env.screen_x * 4 / 9
     local touch_y = env.screen_y * 4 / 9
@@ -79,27 +85,27 @@ function init:reset()
 
     local map_radius = math.min(env.screen_x, env.screen_y) / 2.05 -- Fit onscreen
     local map_start_rads = 3 * math.pi / 4
-    self.map = Arc:new({x = env.screen_x / 2, y = env.screen_y / 2, radius = map_radius, dot_radius = dot_radius * 1.5, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, width = env.trail_width})
+    state.map = Arc:new({x = env.screen_x / 2, y = env.screen_y / 2, radius = map_radius, dot_radius = dot_radius * 1.5, total_rads = -10, start_rads = map_start_rads, end_rads = map_start_rads, width = env.trail_width})
 
     local display_offset = trail_radius * 2;
-    self.players[1] = Player:new({
+    players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
         status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset), display_angle = math.pi * 0.25 })
     })
-    self.players[2] = Player:new({
+    players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
         status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), display_angle = math.pi * 0.75 })
     })
-    self.players[3] = Player:new({
+    players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
         status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.25 })
     })
-    self.players[4] = Player:new({
+    players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, env.screen_y - touch_y) }),
         status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.75 })
     })
-    for i = 1, #self.players, 1 do
-        local p = self.players[i]
+    for i = 1, #players, 1 do
+        local p = players[i]
         local start_rads = (3 + i * 2) % 8 / 4 * math.pi
         p.start_rads = start_rads
         p.active = arc:new({player = i, start_rads = start_rads, end_rads = end_rads})
@@ -107,15 +113,16 @@ function init:reset()
 end
 
 function init:update(dt)
-    local dr = dt * self.env.dt_speedup
-    self.map:update(4 * dr)
-    if self.map:intersectsSelf() then
-        Gamestate.switch(self.states.game)
+    local players = self.state.players
+    for i = 1, #players, 1 do
+        local p = players[i]
+        p.status.playing = true
     end
+    Gamestate.switch(self.states.intermission)
 end
 
 function init:draw()
-    gfx.drawGame(self.players, self.map, true)
+    gfx.drawGame(self.state, true)
 end
 
 function init:focus(focus)

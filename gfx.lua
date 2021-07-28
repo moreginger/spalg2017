@@ -71,7 +71,8 @@ function _build_shader(taps, offset, offset_type, sigma, mult)
     return love.graphics.newShader(shader)
 end
 
-function gfx.drawGame(players, map, draw_map_end)
+function gfx.drawGame(state, draw_map_end)
+    local players, map = state.players, state.map
     local pc = love.graphics.getCanvas()
     love.graphics.setCanvas(c1)
     love.graphics.clear()

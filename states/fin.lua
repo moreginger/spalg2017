@@ -7,11 +7,10 @@ local gfx = require 'gfx'
 -- Post game state.
 local fin = {}
 
-function fin:enter(game)
-    self.states = game.states
-    self.env = game.env
-    self.players = game.players
-    self.map = game.map
+function fin:enter(other)
+    self.env = other.env
+    self.state = other.state
+    self.states = other.states
 
     self.time = 0
     self.can_leave = false
@@ -25,7 +24,7 @@ function fin:update(dt)
 end
 
 function fin:draw()
-    gfx.drawGame(self.players, self.map, false)
+    gfx.drawGame(self.state, false)
     if self.can_leave then
         gfx.drawLogo()
     end
