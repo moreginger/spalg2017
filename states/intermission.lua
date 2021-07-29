@@ -26,14 +26,16 @@ function intermission:enter(other)
     end
 
     local winner = 0
+    local win_points = playing - 1
     for i = 1, #players do
         local player = players[i]
         if player.alive then
-            if player:updateScore(3) then
+            player:finishedGame(win_points)
+            if player:hasWon() then
                 winner = i
             end
         else
-            player:updateScore(-1)
+            player:finishedGame(win_points and (win_points / (playing - 1)) or 0)
         end
     end
 

@@ -1,17 +1,18 @@
 local c1, intermediate = love.graphics.newCanvas(), love.graphics.newCanvas()
 
-local logo_font, trail_length_font, trail_color, trail_blur, pause_blur
+local logo_font, status_font, trail_length_font, trail_color, trail_blur, pause_blur
 
 local gfx = {
 }
 
 function gfx.init(trail_width, trail_radius)
-  trail_length_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius / 3.2)
-  trail_color = { 0, 1, 0, 1 }
-  trail_blur = _build_shader(9, 1, 'center', -1, 1)
-  logo_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius * 3)
   logo_color = { 0.5, 1, 0.5, 0.8 }
+  logo_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius * 3)
   pause_blur = _build_shader(19, 1, 'center', -1, 2)
+  status_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius / 2)
+  trail_blur = _build_shader(9, 1, 'center', -1, 1)
+  trail_color = { 0, 1, 0, 1 }
+  trail_length_font = love.graphics.newFont('resources/comfortaa.bold.ttf', trail_radius / 3.2)
 end
 
 function _build_shader(taps, offset, offset_type, sigma, mult)
@@ -69,6 +70,10 @@ function _build_shader(taps, offset, offset_type, sigma, mult)
 
     local shader = table.concat(code)
     return love.graphics.newShader(shader)
+end
+
+function gfx.statusFont()
+  return status_font
 end
 
 function gfx.drawGame(state, draw_map_end)

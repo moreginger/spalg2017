@@ -130,10 +130,9 @@ function Arc:drawEnd(trail_length_font, trail_color, size, trail_length)
     love.graphics.setFont(trail_length_font)
     love.graphics.translate(point.x, point.y)
     love.graphics.rotate(self.end_rads)
-    trail_length_str = string.format('%.2f', trail_length)
     local font_height = trail_length_font:getHeight()
     love.graphics.setColor(1, 1, 1, 0.5)
-    love.graphics.print(trail_length_str, font_height / 1.5, -font_height / 2.4)
+    love.graphics.print(string.format('%.2f', trail_length), font_height / 1.5, -font_height / 2.4)
     love.graphics.origin()
 end
 

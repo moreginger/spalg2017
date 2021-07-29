@@ -16,6 +16,7 @@ function Player:update(dr)
     if self.toggle_time ~= nil then
         self.toggle_time = self.toggle_time + dr
     end
+    self.status:updateCurrentTrail(self:length())
 end
 
 function Player:detectCollision(collider, dr)
@@ -78,11 +79,7 @@ function Player:draw(trail_length_font, trail_color)
     for i = 1, #self.trail do
         self.trail[i]:drawArc(trail_color)
     end
-    self.status:draw()
-end
-
-function Player:updateScore(delta)
-    return self.status:updateScore(delta)
+    self.status:draw(trail_color)
 end
 
 function Player:playing()
@@ -91,6 +88,14 @@ end
 
 function Player:length()
     return self.trail_length + self.active:length()
+end
+
+function Player:finishedGame(score_delta)
+    return self.status:finishedGame(score_delta)
+end
+
+function Player:hasWon()
+    return self.status:hasWon()
 end
 
 function Player:reset(arc)

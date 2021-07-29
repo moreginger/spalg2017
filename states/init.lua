@@ -54,7 +54,7 @@ function init:init()
 
     gfx.init(env.trail_width, env.trail_radius)
 
-    self.status_tmpl = Status:new({ line_width = env.trail_width, radius = env.trail_radius * 1.5 })
+    self.status_tmpl = Status:new({ font = gfx.statusFont(), line_width = env.trail_width, radius = env.trail_radius * 1.5 })
 
     self:reset()
 end
@@ -90,19 +90,19 @@ function init:reset()
     local display_offset = trail_radius * 2;
     players[1] = Player:new({
         control = Control:new({ key = 'q', region = touchBox(0, 0) }),
-        status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset), display_angle = math.pi * 0.25 })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, display_offset), display_angle = math.pi * 0.75 })
     })
     players[2] = Player:new({
         control = Control:new({ key = 'p', region = touchBox(env.screen_x - touch_x, 0) }),
-        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), display_angle = math.pi * 0.75 })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, display_offset), display_angle = math.pi * 1.25 })
     })
     players[3] = Player:new({
         control = Control:new({ key = '.', region = touchBox(env.screen_x - touch_x, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.25 })
+        status = self.status_tmpl:new({ display_v = vector(env.screen_x - display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.75 })
     })
     players[4] = Player:new({
         control = Control:new({ key = 'z', region = touchBox(0, env.screen_y - touch_y) }),
-        status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset), display_angle = math.pi * 1.75 })
+        status = self.status_tmpl:new({ display_v = vector(display_offset, env.screen_y - display_offset), display_angle = math.pi * 2.25 })
     })
     for i = 1, #players, 1 do
         local p = players[i]
