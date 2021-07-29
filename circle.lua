@@ -28,6 +28,7 @@ function intersectAngles(c1, c2)
         return {}
     end
 
+    -- Modern atan is not a direct replacement, see https://pgl.yoyo.org/luai/i/math.atan2
     angle = math.atan2(dy, dx)
     -- print('base angle', angle)
     -- Distance at which the intersection points 'flip' onto the opposite side of the circle
