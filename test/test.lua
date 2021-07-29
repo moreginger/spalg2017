@@ -3,7 +3,7 @@ require 'arc'
 failed = 0
 
 function testIntersectsArc(name, query, static, expect)
-    print('testing', name, '...')
+    print(name .. '...')
     if expect ~= query:intersectsArc(static) then
         print('!!!FAILED!!!')
         print('')
@@ -12,6 +12,9 @@ function testIntersectsArc(name, query, static, expect)
 end
 
 function test()
+    print('*** RUNNING TESTS ***')
+    print('')
+
     base = Arc:new({ x = 0, y = 0, radius = 100, start_rads = 0, end_rads = 2 * math.pi})
 
     testIntersectsArc('coincident circles', base, base, 1)
@@ -43,7 +46,7 @@ function test()
     testIntersectsArc('intersecting arcs 3', half_lower_acw, half_upper_acw:new({x = 10, y = 100}), 2)
     testIntersectsArc('intersecting arcs 4', half_upper_acw:new({x = 10, y = 100}), half_lower_acw, 2)
 
-    -- testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, false)
+    testIntersectsArc('disjoint arcs 1', half_upper_acw:new({x = 10, y = 10}), half_lower_acw, 0)
     testIntersectsArc('disjoint arcs 2', half_upper_acw:new({x = 150, y = 150}), half_lower_acw, 0)
 
     testIntersectsArc('real intersect 1', Arc:new({x = 393, y = 263, start_rads = 4.7, end_rads = 1.0, radius = 37.5}), Arc:new({x = 340, y = 306, start_rads = 3.6, end_rads = -1.1, radius = 37.5}), 1)
@@ -60,8 +63,11 @@ function test()
     print('*** FINISHED TESTING ***')
     print('')
 
-    if failed > 0 then
-        print('Failed ' .. failed .. ' tests.')
-        io.read()
+    if failed == 0 then
+        print('Success!')
+        return 0
     end
+    
+    print('Failed ' .. failed .. ' tests.')
+    return 1
 end
