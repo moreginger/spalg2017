@@ -27,7 +27,7 @@ function Player:detectCollision(collider, dr)
             local arc = self.active
             local other = shape.arc
             if arc.player == other.player then
-                arc = arc:withTrimmedStart(other.total_rads + math.pi * 2)
+                arc = arc:withTrimmedEnd(other.total_rads + math.pi * 2)
             end
             if arc ~= nil then
                 local intersects = arc:intersectsArc(other)

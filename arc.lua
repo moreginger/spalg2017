@@ -54,16 +54,19 @@ end
 -- Return new arc with the portion before 'total_rads' is reached trimmed.
 -- Return nil if this leaves no arc.
 -- Used in collision detection to avoid immediate "collision" with previous path segment.
-function Arc:withTrimmedStart(total_rads)
-    local arc_delta = self.end_rads - self.start_rads
-    local start_rads_adj = total_rads - self.total_rads
-    if start_rads_adj > math.abs(arc_delta) then
-        return nil
-    elseif start_rads_adj <= 0 then
+function Arc:withTrimmedEnd(total_rads)
+    local adj = total_rads - self.total_rads
+    if adj <= 0 then
         return self
     end
-    local start_rads = self.start_rads + start_rads_adj * math.sign(arc_delta)
-    return self:new({ start_rads = start_rads })
+
+    local arc_delta = self.end_rads - self.start_rads
+    if adj >= math.abs(arc_delta) then
+        return nil
+    end
+    
+    local end_rads = self.end_rads - adj * math.sign(arc_delta)
+    return self:new({ end_rads = end_rads })
 end
 
 function Arc:intersectsSelf()

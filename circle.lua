@@ -42,7 +42,7 @@ function intersectAngles(c1, c2)
     end
     -- print('flip flop', d, flip_d, c1_fudge, c2_fudge)
 
-    --   // Single intersection (kissing circles)
+    -- Single intersection (kissing circles)
     c1_angle = angle + c1_fudge
     c2_angle = angle + c2_fudge
     if math.abs(gap) < eps or math.abs(nested_gap) < eps then
