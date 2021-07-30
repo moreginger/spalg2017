@@ -107,6 +107,19 @@ function Player:reset(arc)
     self.alive = true
 end
 
+function Player:toJson()
+    local trail = {}
+    for i = 1, #self.trail do
+        local arc = self.trail[i]
+        trail[i] = arc:toJson()
+    end
+    trail[#trail+1] = self.active:toJson()
+
+    return {
+        trail = trail
+    }
+end
+
 function Player:new (o)
     o = o or {}
     setmetatable(o, self)

@@ -149,6 +149,18 @@ function Arc:length()
     return math.abs(self.end_rads - self.start_rads)
 end
 
+function Arc:toJson()
+    return {
+        direction = self.direction,
+        end_rads = self.end_rads,
+        radius = self.radius,
+        start_rads = self.start_rads,
+        total_rads = self.total_rads,
+        x = self.x,
+        y = self.y,
+    }
+end
+
 function Arc:new(o)
     o = o or {}
     setmetatable(o, self)

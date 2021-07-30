@@ -20,6 +20,7 @@ local pause = require 'states.pause'
 -- (re)initialize game state
 local init = {
     env = {
+        debug_save = os.getenv('SPALG_DEBUG_SAVE') == 'true' and true or false,
         min_speed = 0.25 * math.pi, -- Speed in radians / s.
         max_speed = 4 * math.pi,
         speedup_time = 240, -- Time to reach max speed in s.

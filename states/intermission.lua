@@ -1,6 +1,7 @@
 package.path = "../?.lua;" .. package.path
 
 local Gamestate = require 'hump.gamestate'
+local JsonEncoder = require 'lunajson.encoder'
 
 local gfx = require 'gfx'
 
@@ -17,6 +18,11 @@ function intermission:enter(other)
 
     local state = self.state
     local players = state.players
+    
+    if self.env.debug_save then
+      self:_saveGame()        
+    end
+
     local playing = 0;
     for i = 1, #players do
         local p = players[i]
@@ -67,6 +73,23 @@ function intermission:focus(focus)
     if not focus then
         Gamestate.push(self.states.pause)
     end
+end
+
+function intermission:_saveGame()
+    local players = self.state.players
+
+    local players_json = {}
+
+    for i = 1, #players do
+        local player = players[i]:toJson()
+        player['index'] = i
+        players_json[i] = player
+    end
+
+    local json = { players = players_json }
+    local json_str = JsonEncoder()(json)
+
+    print(json_str)
 end
 
 return intermission
