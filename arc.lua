@@ -121,7 +121,14 @@ end
 function Arc:drawArc(trail_color)
     love.graphics.setColor(trail_color[1], trail_color[2], trail_color[3], trail_color[4])
     love.graphics.setLineWidth(self.width)
-    love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
+
+    local length = math.abs(self.start_rads - self.end_rads) * self.radius
+    if length >= 5 then
+        love.graphics.arc('line', 'open', self.x, self.y, self.radius, self.start_rads, self.end_rads)
+    else
+        -- love.graphics.arc doesn't draw anything for very small arcs
+        love.graphics.line(self.x + self.radius * math.cos(self.start_rads), self.y + self.radius * math.sin(self.start_rads), self.x + self.radius * math.cos(self.end_rads), self.y + self.radius * math.sin(self.end_rads))
+    end
 end
 
 function Arc:drawEnd(trail_length_font, trail_color, size, trail_length)
