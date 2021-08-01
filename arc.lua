@@ -1,7 +1,5 @@
 require 'circle'
 
-debug = false
-
 Arc = {
     x = 0,
     y = 0,
@@ -51,71 +49,53 @@ function Arc:rads()
     return self.direction == 'acw' and self.end_rads or self.end_rads - math.pi
 end
 
--- Return new arc with the portion before 'total_rads' is reached trimmed.
--- Return nil if this leaves no arc.
--- Used in collision detection to avoid immediate "collision" with previous path segment.
-function Arc:withTrimmedEnd(total_rads)
-    local adj = total_rads - self.total_rads
-    if adj <= 0 then
-        return self
-    end
-
-    local arc_delta = self.end_rads - self.start_rads
-    if adj >= math.abs(arc_delta) then
-        return nil
-    end
-    
-    local end_rads = self.end_rads - adj * math.sign(arc_delta)
-    return self:new({ end_rads = end_rads })
-end
-
 function Arc:intersectsSelf()
     local arc_delta = self.end_rads - self.start_rads
     return math.abs(arc_delta) >= math.pi * 2
 end
 
 function Arc:intersectsArc(other)
+    -- Special case self intersect
+    if self == other then
+        return (math.abs(self.end_rads - self.start_rads) >= 2 * math.pi) and 1 or 0
+    end
+
     local intersect_angles = intersectAngles(self, other)
     if intersect_angles == nil then
         -- overlapping (should not happen)
-        if isBetween(other.start_rads, other.end_rads, self.end_rads) then
-            if debug then
-                print('overlap found!')
-            end
-            return 1
-        else
-            return 0
-        end
+        return getAdjustedBetween(other.start_rads, other.end_rads, self.end_rads) and 1 or 0
     else
         local intersects = 0;
         for i, angles in pairs(intersect_angles) do
-            if debug then
-                print('testing arcs')
-                print('[' .. self.player .. ',' .. self.x .. ',' .. self.y .. ',' .. self.radius .. ']' .. ' ' .. self.start_rads .. ' : ' .. self.end_rads .. ' @' .. angles[2])
-                print('[' .. other.player .. ',' .. other.x .. ',' .. other.y .. ',' .. other.radius .. ']' .. ' ' .. other.start_rads .. ' : ' .. other.end_rads .. ' @' .. angles[1])
-            end
-            if isBetween(self.start_rads, self.end_rads, angles[1]) and isBetween(other.start_rads, other.end_rads, angles[2]) then
-                if debug then
-                    print('intersect found!')
+            local self_intersect, other_intersect = getAdjustedBetween(self.start_rads, self.end_rads, angles[1]), getAdjustedBetween(other.start_rads, other.end_rads, angles[2])
+            if self_intersect and other_intersect then
+                if self.player ~= other.player then
+                    intersects = intersects + 1
+                else
+                    -- Can't hit own line until at least 2 * pi past intersection. This stops adjoining arc segments from intersecting until a full circle is complete.
+                    local other_total_at_intersect = other:totalWithEnd(other_intersect)
+                    if self.total_rads - other_total_at_intersect >= 2 * math.pi then
+                        intersects = intersects + 1
+                    end
                 end
-                intersects = intersects + 1
             end
         end
         return intersects
     end
 end
 
-function isBetween(start_rads, end_rads, query_rads)
+function getAdjustedBetween(start_rads, end_rads, query_rads)
     start_rads, end_rads = math.min(start_rads, end_rads), math.max(start_rads, end_rads)
-    if debug then
-        print('start end query')
-        print(start_rads, end_rads, query_rads)
-    end
-    if end_rads - start_rads >= math.pi * 2 then return true end
-    end_rads = normalizeAngle(end_rads - start_rads)
-    query_rads = normalizeAngle(query_rads - start_rads)
-    if debug then print('-', end_rads, query_rads) end
-    return query_rads <= end_rads
+    local two_pi = 2 * math.pi
+    -- Adjust query which is in 0..2*pi range to the (possible) range of our arc.
+    query_rads = query_rads + two_pi * math.floor(start_rads / two_pi)
+    query_rads = (start_rads <= query_rads) and query_rads or query_rads + two_pi
+    return (start_rads <= query_rads and query_rads <= end_rads) and query_rads or nil
+end
+
+function Arc:totalWithEnd(new_end)
+    local end_delta = self.end_rads - new_end
+    return self.total_rads - math.abs(end_delta)
 end
 
 function Arc:drawArc(trail_color)

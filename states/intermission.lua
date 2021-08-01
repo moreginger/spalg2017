@@ -90,6 +90,8 @@ function intermission:_saveGame()
     local json_str = JsonEncoder()(json)
 
     print(json_str)
+
+    io.read()
 end
 
 return intermission

@@ -26,18 +26,13 @@ function Player:detectCollision(collider, dr)
         for shape, delta in pairs(collider:collisions(self.active.co)) do
             local arc = self.active
             local other = shape.arc
-            if arc.player == other.player then
-                arc = arc:withTrimmedEnd(other.total_rads + math.pi * 2)
-            end
-            if arc ~= nil then
-                local intersects = arc:intersectsArc(other)
-                if intersects > 0 then
-                    -- OK arcs intersect but who hit who?
-                    local regressedArc = arc:new()
-                    regressedArc:update(-dr)
-                    if intersects ~= regressedArc:intersectsArc(other) then
-                        self.alive = false
-                    end
+            local intersects = arc:intersectsArc(other)
+            if intersects > 0 then
+                -- OK arcs intersect but who hit who?
+                local regressedArc = arc:new()
+                regressedArc:update(-dr)
+                if intersects ~= regressedArc:intersectsArc(other) then
+                    self.alive = false
                 end
             end
         end
